@@ -1,3 +1,16 @@
+/**
+ * @file comparisonUtils.ts
+ * @description Utilidades para cálculos de comparación de precios
+ * 
+ * MANTENIMIENTO:
+ * - Si las fórmulas de porcentaje cambian, actualizar aquí y en priceCalculations.ts
+ * - Asegurar que la fórmula de variación sea consistente: ((Base / Competidor) - 1) * 100
+ * - Los campos 'mX_ratio' se usan en el backend, no modificar sin consultar
+ * 
+ * @author Carlos Cusi
+ * @date 2026-03-03
+ */
+
 import type { IProductoEditado } from '../interfaces';
 
 export function calculateDataWithPercentages(

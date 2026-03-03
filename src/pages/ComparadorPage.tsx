@@ -22,10 +22,6 @@ import { exportApi } from '../utils/api';
 import { useAuth } from '../contexts/auth';
 import { useToast } from '../contexts/ToastContext';
 import { ComparisonBar } from '../components/comparador/ComparisonBar';
-// Product analysis cards are available but not used in this view (kept commented for possible future use)
-// import { ProductAnalysisCard } from '../components/comparador/ProductAnalysisCard';
-// import { ProductAnalysisCardCompact } from '../components/comparador/ProductAnalysisCardCompact';
-// import { ProductAnalysisCardFinal } from '../components/comparador/ProductAnalysisCardFinal';
 import { ProductAnalysisCardWithBarChartRefactor } from '../components/comparador/ProductAnalysisCardWithBarChartRefactor';
 import { getBrandColor, getBrandHeaderStylesByPosition, getBrandColorByPosition } from '../utils/colorScheme';
 // Nuevos componentes avanzados
@@ -107,7 +103,6 @@ export const ComparadorPage: React.FC = () => {
   const exportWrapperRef = useRef<HTMLDivElement>(null); // Ref wrapper para exportar ambas secciones
   const comparisonTableRef = useRef<HTMLDivElement>(null); // Ref para la tabla de comparación
   const searchInputRef = useRef<HTMLInputElement>(null); // Ref para input de búsqueda
-  // tableRef removed (unused)
   const searchResultsListRef = useRef<HTMLUListElement>(null); // Ref para lista de resultados virtualizada
 
 
@@ -614,7 +609,6 @@ export const ComparadorPage: React.FC = () => {
     }
   };
 
-  // export modal trigger removed (unused)
 
   // Función para limpiar todo manualmente
   const handleClearAll = () => {
@@ -625,7 +619,6 @@ export const ComparadorPage: React.FC = () => {
   };
 
   // Función para determinar el estilo de las celdas de porcentaje (verde/rojo)
-  // Percentage cell class helper removed (unused)
   
 
   // Definición de columnas de la tabla (memorizada para rendimiento)

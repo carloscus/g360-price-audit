@@ -2,6 +2,18 @@
 //                                                                             #
 //                       src/store/useAppStore.ts                              #
 //                                                                             #
+// MANTENIMIENTO:
+// - Store principal de Zustand para el módulo de precios
+// - Usa persistencia en localStorage (clave: 'app-storage')
+// - El catálogo se carga desde public/data/productos.json
+// - También usa IndexedDB para caché del catálogo
+// - Si el catálogo no carga, verificar: 
+//   1. El archivo public/data/productos.json existe
+//   2. El servidor de desarrollo está corriendo
+//   3. No hay errores de CORS
+//
+// @author Carlos Cusi
+// @date 2026-03-03
 // --------------------------------------------------------------------------- #
 
 // --- 1. Importaciones necesarias ---

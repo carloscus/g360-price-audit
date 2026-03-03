@@ -3,6 +3,14 @@
 //                                                                             #
 //                         src/hooks/useSearch.ts                              #
 //                                                                             #
+// MANTENIMIENTO:
+// - Este hook usa useMemo para optimización de rendimiento
+// - El orden de prioridad de búsqueda es: código > EAN > keywords > nombre
+// - Si se necesita cambiar la prioridad, modificar el orden en el filter
+// - La búsqueda es case-insensitive
+//
+// @author Carlos Cusi
+// @date 2026-03-03
 // --------------------------------------------------------------------------- #
 
 // --- 1. Importaciones necesarias ---

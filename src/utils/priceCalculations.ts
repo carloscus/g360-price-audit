@@ -1,4 +1,17 @@
 /**
+ * @file priceCalculations.ts
+ * @description Utilidades centralizadas para cálculos de precios y porcentajes
+ * 
+ * MANTENIMIENTO:
+ * - Funciones puras de cálculo, sin dependencias de estado
+ * - Usar estas funciones para nuevos cálculos en lugar de duplicar lógica
+ * - Las fórmulas están documentadas en cada función
+ * 
+ * @author Carlos Cusi
+ * @date 2026-03-03
+ */
+
+/**
  * Utilidades centralizadas para cálculos de precios y porcentajes
  * Elimina duplicación de lógica matemática en toda la aplicación
  */

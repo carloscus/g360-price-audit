@@ -3,6 +3,14 @@
 //                  src/store/useMarginStore.ts                                #
 //           Store para Calculadora de Margen                                  #
 //                                                                             #
+// MANTENIMIENTO:
+// - Este store usa Zustand con persistencia en localStorage
+// - Las fórmulas de cálculo están centralizadas en este archivo
+// - Si se modifica la lógica de cálculo, actualizar también priceCalculations.ts
+// - El campo 'lockedFields' controla qué campos se calculan automáticamente
+//
+// @author Carlos Cusi
+// @date 2026-03-03
 // --------------------------------------------------------------------------- #
 
 import { create } from 'zustand';

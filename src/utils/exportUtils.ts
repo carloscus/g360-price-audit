@@ -1,4 +1,18 @@
 /**
+ * @file exportUtils.ts
+ * @description Utilidades para exportación de datos (PNG, PDF)
+ * 
+ * MANTENIMIENTO:
+ * - Maneja compatibilidad con CSS variables para html2canvas
+ * - Si html2canvas falla, revisar si hay funciones de color CSS no soportadas
+ * - Las funciones safeSetStyle filtran colores como lab(), lch(), oklch(), etc.
+ * - El tema se detecta automáticamente por la clase 'dark' en documentElement
+ * 
+ * @author Carlos Cusi
+ * @date 2026-03-03
+ */
+
+/**
  * Utility functions for handling export functionality with CSS variable compatibility
  */
 
