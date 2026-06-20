@@ -5,7 +5,7 @@
 // --------------------------------------------------------------------------- #
 
 // --- 1. Importaciones necesarias ---
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { FormGroup, Label } from './ui/FormControls';
 import { StyledInput } from './ui/StyledInput';
@@ -48,6 +48,7 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
 
   // Estado para tooltips de marcas duplicadas
   const [marcaTooltips, setMarcaTooltips] = useState<{ [key: string]: string }>({});
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // --- C. Lógica de Manejo de Cambios y Validación ---
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -118,7 +119,20 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
     }
 
     setMarcaTooltips(newTooltips);
+
+    // Auto-dismiss tooltips después de 3 segundos
+    if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+    if (Object.keys(newTooltips).length > 0) {
+      tooltipTimerRef.current = setTimeout(() => setMarcaTooltips({}), 3000);
+    }
   };
+
+  // Cleanup timer al desmontar
+  useEffect(() => {
+    return () => {
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+    };
+  }, []);
 
   // --- D. Efecto para setear la fecha actual por defecto ---
   useEffect(() => {
