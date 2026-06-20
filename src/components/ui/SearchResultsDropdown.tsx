@@ -38,50 +38,22 @@ export const SearchResultsDropdown: React.FC<SearchResultsDropdownProps> = ({
 
   if (!isOpen || !searchTerm || results.length === 0) return null;
 
-  const dropdownStyle: React.CSSProperties = {
-    position: 'absolute',
-    zIndex: 99999,
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  if (searchInputRef.current) {
-    const rect = searchInputRef.current.getBoundingClientRect();
-
-    if (isMobile) {
-      // En móvil, ignoramos el ancho del input y usamos márgenes laterales fijos
-      dropdownStyle.top = rect.bottom + 8;
-      dropdownStyle.left = '12px';
-      dropdownStyle.right = '12px';
-      dropdownStyle.width = 'auto';
-      dropdownStyle.maxHeight = `calc(100vh - ${rect.bottom + 24}px)`;
-    } else {
-      dropdownStyle.top = rect.bottom + 8;
-      dropdownStyle.left = rect.left;
-      dropdownStyle.width = rect.width;
-      dropdownStyle.maxHeight = '420px';
-    }
-  } else {
-    dropdownStyle.width = '640px';
-    dropdownStyle.maxHeight = '420px';
-  }
-
   return createPortal(
     <div
-      className="fixed inset-0 z-[99998] animate-fade-in"
+      className="fixed inset-0 z-[99998] flex items-center justify-center p-4 animate-fade-in"
       style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}
       role="dialog"
       aria-label="Resultados de búsqueda"
       onClick={onClose}
     >
-      <ul
-        className="glass-card overflow-hidden shadow-2xl border-[var(--color-primary-500)]/20"
-        style={dropdownStyle}
+      <div
+        className="glass-card overflow-hidden shadow-2xl border-[var(--color-primary-500)]/20 w-full max-w-lg max-h-[80vh] flex flex-col animate-scale-in"
+        style={{ pointerEvents: 'auto' }}
+        onClick={(e) => e.stopPropagation()}
         role="listbox"
         aria-label="Resultados de búsqueda"
-        onClick={(e) => e.stopPropagation()}
       >
-        <li className="flex-shrink-0 border-b border-[var(--border-primary)] p-4" style={{ background: 'var(--surface-secondary)' }}>
+        <div className="flex-shrink-0 border-b border-[var(--border-primary)] p-4" style={{ background: 'var(--surface-secondary)' }}>
           <div className="flex items-center justify-between gap-2">
             <label className="flex items-center gap-3 cursor-pointer text-[var(--text-primary)] font-medium hover:text-[var(--color-primary-500)] transition-colors">
               <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
@@ -122,14 +94,14 @@ export const SearchResultsDropdown: React.FC<SearchResultsDropdownProps> = ({
               </button>
             </div>
           </div>
-        </li>
+        </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
           {results.map((p) => {
             const isAlreadyAdded = addedIds.has(p.codigo);
             const isSelected = selectedIds.has(p.codigo);
             return (
-              <li
+              <div
                 key={p.codigo}
                 role="option"
                 aria-selected={isSelected}
@@ -185,11 +157,11 @@ export const SearchResultsDropdown: React.FC<SearchResultsDropdownProps> = ({
                     )}
                   </div>
                 </div>
-              </li>
+              </div>
             );
           })}
         </div>
-      </ul>
+      </div>
     </div>,
     document.body
   );
