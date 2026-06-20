@@ -51,7 +51,12 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
 
   // --- C. Lógica de Manejo de Cambios y Validación ---
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    // Filtrar solo dígitos para documento_cliente
+    if (name === 'documento_cliente') {
+      value = value.replace(/\D/g, '');
+    }
 
     // Lógica de validación (se puede expandir)
     let rules: ValidationRule[] = [];
@@ -184,11 +189,24 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
           <>
             <FormGroup>
               <Label htmlFor="documento_cliente">Documento</Label>
-              <StyledInput id="documento_cliente" name="documento_cliente" value={formState.documento_cliente || ''} onChange={handleChange} placeholder="DNI/RUC" variant={variant} className="h-7 text-sm" />
+              <div className="relative">
+                <StyledInput id="documento_cliente" name="documento_cliente" value={formState.documento_cliente || ''} onChange={handleChange} maxLength={11} placeholder="8 o 11 dígitos" variant={variant} className="h-7 text-sm pr-14" />
+                {(() => {
+                  const digits = (formState.documento_cliente || '').replace(/\D/g, '');
+                  const len = digits.length;
+                  if (len === 11) {
+                    return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-accent-500)] px-1.5 py-0.5 rounded pointer-events-none">RUC</span>;
+                  }
+                  if (len === 8) {
+                    return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-success-500)] px-1.5 py-0.5 rounded pointer-events-none">DNI</span>;
+                  }
+                  return null;
+                })()}
+              </div>
             </FormGroup>
             <FormGroup>
               <Label htmlFor="cliente">Cliente</Label>
-              <StyledInput id="cliente" name="cliente" value={formState.cliente || ''} onChange={handleChange} placeholder="Razón social" variant={variant} className="h-7 text-sm" />
+              <StyledInput id="cliente" name="cliente" value={formState.cliente || ''} onChange={handleChange} placeholder="Nombre o razón social" variant={variant} className="h-7 text-sm" />
             </FormGroup>
           </>
         )}
