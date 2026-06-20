@@ -206,7 +206,13 @@ const fieldConfig: FieldConfig = { showRucDni: true, showCodigoCliente: true, sh
 const { userName } = useAuth();
 
 return (
-	<div className="min-h-screen pb-8 sm:pb-12 md:pb-20 transition-colors duration-500 module-comparador" role="main">
+	<div className="min-h-screen pb-8 sm:pb-12 md:pb-20 transition-colors duration-500 module-comparador relative" role="main">
+		<div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+			<div className="absolute top-[-10%] left-[20%] w-[35%] h-[35%] rounded-full bg-[var(--color-comparador-primary)] opacity-[0.04] blur-[100px]"></div>
+			<div className="absolute bottom-[-10%] right-[10%] w-[30%] h-[30%] rounded-full bg-[var(--color-comparador-light)] opacity-[0.03] blur-[100px]"></div>
+		</div>
+		<div className="fixed inset-0 z-0 pointer-events-none bg-dots-dark" aria-hidden="true"></div>
+
 		<a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[var(--color-primary-500)] text-[var(--color-text-inverse)] px-4 py-2 rounded-lg z-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-400)] focus:ring-offset-2">
 			Ir al contenido principal
 		</a>

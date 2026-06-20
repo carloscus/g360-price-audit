@@ -1,5 +1,5 @@
 export const COLOR_SCHEME = {
-  'Mi Marca': '#00a86b',
+  'Mi Marca': '#f97316',
   'vinifan2': '#e11d48',
   'artesco': '#b45309',
   'layconsa': '#7c3aed',
@@ -71,10 +71,10 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 };
 
 export const POSITION_COLOR_PALETTE = [
-  '#2563EB',
+  '#F97316',
   '#E11D48',
   '#059669',
-  '#B45309',
+  '#0D9488',
   '#7C3AED',
 ];
 
@@ -94,8 +94,8 @@ const BRAND_CSS_VAR_HEADER = [
   '--color-brand-4-header',
 ];
 
-const BRAND_FALLBACK_TEXT = ['#2563EB', '#E11D48', '#059669', '#B45309', '#7C3AED'];
-const BRAND_FALLBACK_HEADER = ['#2563EB', '#E11D48', '#059669', '#D97706', '#7C3AED'];
+const BRAND_FALLBACK_TEXT = ['#F97316', '#E11D48', '#059669', '#0D9488', '#7C3AED'];
+const BRAND_FALLBACK_HEADER = ['#EA580C', '#DC2626', '#059669', '#0F766E', '#7C3AED'];
 
 function resolveCSSVar(varName: string, fallback: string): string {
   if (typeof document !== 'undefined') {

@@ -138,7 +138,7 @@
   --color-comparador-border: rgba(26, 86, 219, 0.12);
 
   /* Marcas / Competidores */
-  --color-mi-marca: var(--color-primary-500);
+  --color-mi-marca: #f97316;
   --color-competidor-1: var(--color-info-500);
   --color-competidor-2: var(--color-success-500);
   --color-competidor-3: var(--color-warning-500);
@@ -146,14 +146,14 @@
   --color-competidor-5: #8b5cf6;
 
   /* Brand Colors (para etiquetas de marca) */
-  --color-brand-0-text: #1a56db;
-  --color-brand-0-header: #1a56db;
+  --color-brand-0-text: #f97316;
+  --color-brand-0-header: #ea580c;
   --color-brand-1-text: #dc2626;
   --color-brand-1-header: #dc2626;
   --color-brand-2-text: #059669;
   --color-brand-2-header: #059669;
-  --color-brand-3-text: #b45309;
-  --color-brand-3-header: #d97706;
+  --color-brand-3-text: #0d9488;
+  --color-brand-3-header: #0f766e;
   --color-brand-4-text: #7c3aed;
   --color-brand-4-header: #7c3aed;
   --color-brand-default-text: #627d98;
@@ -397,14 +397,14 @@
   --color-input-tint-default-ring: rgba(26, 86, 219, 0.18);
 
   /* Brand Colors - Dark Mode */
-  --color-brand-0-text: #60a5fa;
-  --color-brand-0-header: #1a56db;
+  --color-brand-0-text: #fb923c;
+  --color-brand-0-header: #f97316;
   --color-brand-1-text: #f87171;
   --color-brand-1-header: #dc2626;
   --color-brand-2-text: #34d399;
   --color-brand-2-header: #059669;
-  --color-brand-3-text: #fbbf24;
-  --color-brand-3-header: #d97706;
+  --color-brand-3-text: #2dd4bf;
+  --color-brand-3-header: #14b8a6;
   --color-brand-4-text: #a78bfa;
   --color-brand-4-header: #7c3aed;
   --color-brand-default-text: #829ab1;
@@ -524,6 +524,94 @@ h4 { font-size: var(--font-size-md); font-weight: var(--font-weight-medium); }
   --module-light: var(--color-comparador-light);
   --module-dark: var(--color-comparador-dark);
   --module-surface: var(--color-comparador-surface);
+}
+
+/* ========================================
+   BACKGROUND PATTERNS & EFFECTS
+   ======================================== */
+.login-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-dots {
+  background-image: radial-gradient(circle, var(--color-primary-200) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.bg-dots-dark {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.bg-glow-top {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26, 86, 219, 0.12), transparent);
+}
+
+.bg-glow-right {
+  background: radial-gradient(ellipse 50% 80% at 100% 50%, rgba(239, 68, 68, 0.08), transparent);
+}
+
+.dark .bg-glow-top {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26, 86, 219, 0.18), transparent);
+}
+
+/* ========================================
+   NEON / BLACKLIGHT (dark mode only)
+   ======================================== */
+.dark .card-neon {
+  box-shadow:
+    0 0 30px rgba(26, 86, 219, 0.10),
+    0 0 60px rgba(26, 86, 219, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: rgba(26, 86, 219, 0.25);
+}
+
+.dark .card-neon:hover {
+  box-shadow:
+    0 0 40px rgba(26, 86, 219, 0.15),
+    0 0 80px rgba(26, 86, 219, 0.08);
+  border-color: rgba(26, 86, 219, 0.35);
+}
+
+.dark .input-neon:focus {
+  border-color: var(--color-primary-400) !important;
+  box-shadow:
+    0 0 0 3px rgba(26, 86, 219, 0.15),
+    0 0 15px rgba(26, 86, 219, 0.08) !important;
+}
+
+.dark .btn-neon {
+  box-shadow:
+    0 4px 20px rgba(26, 86, 219, 0.30),
+    0 0 30px rgba(26, 86, 219, 0.10);
+  border-color: rgba(26, 86, 219, 0.3);
+}
+
+.dark .btn-neon:hover {
+  box-shadow:
+    0 6px 25px rgba(26, 86, 219, 0.40),
+    0 0 40px rgba(26, 86, 219, 0.15);
+  transform: translateY(-1px);
+}
+
+.dark .btn-neon:active {
+  box-shadow:
+    0 2px 10px rgba(26, 86, 219, 0.25);
+  transform: translateY(0);
+}
+
+.dark .header-neon-bottom {
+  border-bottom: 1px solid rgba(26, 86, 219, 0.20) !important;
+  box-shadow: 0 1px 15px rgba(26, 86, 219, 0.06);
+}
+
+.dark .glow-accent {
+  box-shadow:
+    0 0 15px rgba(239, 68, 68, 0.15),
+    0 0 30px rgba(239, 68, 68, 0.08);
 }
 
 /* ========================================

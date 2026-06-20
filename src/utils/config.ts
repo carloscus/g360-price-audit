@@ -28,9 +28,9 @@ export const COLOR_PALETTES = {
         background: 'rgba(255, 99, 132, 0.2)',
         border: 'rgba(255, 99, 132, 1)'
     },
-    vinifan: { // Paleta de Azules
-        background: 'rgba(54, 162, 235, 0.2)',
-        border: 'rgba(54, 162, 235, 1)'
+    vinifan: { // Paleta de Naranja
+        background: 'rgba(249, 115, 22, 0.2)',
+        border: 'rgba(249, 115, 22, 1)'
     },
     otros: { // Paleta de Verdes
         background: 'rgba(75, 192, 192, 0.2)',

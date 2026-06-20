@@ -73,6 +73,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 
   const consistentClass = 'input-whatif-editable rounded-md border bg-[var(--surface-elevated)] h-6 flex items-center px-1 text-xs font-mono text-right price-cell-45 transition-all duration-200';
 
+  const isDark = document.documentElement.classList.contains('dark');
+
   return (
     <div className="relative price-input-wrapper group">
       {!isFocused ? (
@@ -87,18 +89,20 @@ export const PriceInput: React.FC<PriceInputProps> = ({
             ${isBestOffer
               ? 'border-[var(--color-success)] ring-1 ring-[var(--color-success)]/30 shadow-sm shadow-[var(--color-success)]/10'
               : 'border-[var(--border-secondary)]'}
-            cursor-pointer hover:border-[var(--color-primary)] hover:shadow-sm hover:shadow-[var(--color-primary)]/10
-            group-hover:bg-[var(--bg-tertiary)]
+            cursor-pointer
+            ${isDark
+              ? 'hover:border-[var(--color-primary-400)] hover:shadow-[0_0_12px_rgba(26,86,219,0.12)] group-hover:bg-[var(--bg-tertiary)]'
+              : 'hover:border-[var(--color-primary)] hover:shadow-sm hover:shadow-[var(--color-primary)]/10 group-hover:bg-[var(--bg-tertiary)]'}
           `}
           style={inputStyle}
         >
           {initialValue !== null ? (
             <span className="flex items-center gap-0.5 w-full justify-end">
-              <span className="currency-symbol text-[var(--text-tertiary)] text-xs">S/</span>
-              <span>{initialValue.toFixed(2)}</span>
+              <span className="currency-symbol text-[var(--text-secondary)] text-xs">S/</span>
+              <span className="text-[var(--text-primary)] font-semibold">{initialValue.toFixed(2)}</span>
             </span>
           ) : (
-            <span className="text-[var(--text-tertiary)] opacity-60 text-xs italic truncate">Precio en {competidor}</span>
+            <span className="text-[var(--text-secondary)] text-xs italic truncate">Precio en {competidor}</span>
           )}
         </div>
       ) : (
@@ -114,8 +118,12 @@ export const PriceInput: React.FC<PriceInputProps> = ({
           style={inputStyle}
           className={`
             ${consistentClass}
-            ${isBestOffer ? 'border-[var(--color-success)] ring-1 ring-[var(--color-success)]/20' : 'border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20'}
-            shadow-sm shadow-[var(--color-primary)]/10
+            text-[var(--text-primary)] font-semibold
+            ${isBestOffer
+              ? 'border-[var(--color-success)] ring-1 ring-[var(--color-success)]/20'
+              : isDark
+                ? 'border-[var(--color-primary-500)] ring-2 ring-[var(--color-primary)]/15 shadow-[0_0_15px_rgba(26,86,219,0.08)]'
+                : 'border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20 shadow-sm shadow-[var(--color-primary)]/10'}
           `}
           inputMode="decimal"
           pattern="[0-9]*[.]?[0-9]*"

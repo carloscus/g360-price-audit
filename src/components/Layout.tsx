@@ -59,22 +59,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
 
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--color-primary-500)] opacity-[0.03] blur-[100px]" aria-hidden="true"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--color-secondary-500)] opacity-[0.02] blur-[100px]" aria-hidden="true"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div className="absolute top-[-15%] left-[-8%] w-[50%] h-[50%] rounded-full bg-[var(--color-primary-500)] opacity-[0.06] blur-[120px]"></div>
+        <div className="absolute bottom-[-15%] right-[-8%] w-[45%] h-[45%] rounded-full bg-[var(--color-accent-500)] opacity-[0.04] blur-[120px]"></div>
+        <div className="absolute top-[40%] right-[-5%] w-[25%] h-[25%] rounded-full bg-[var(--color-secondary-400)] opacity-[0.03] blur-[100px]"></div>
+        <div className="absolute bottom-[30%] left-[-5%] w-[20%] h-[20%] rounded-full bg-[var(--color-primary-300)] opacity-[0.03] blur-[90px]"></div>
       </div>
 
       {isLoggedIn && !isLoginPage && (
         <header className="sticky top-0 z-50 w-full glass border-b border-[var(--border-glass)]" role="banner">
           <div className="w-full px-4 h-14 flex items-center justify-between">
 
-            <div className="flex items-center gap-2.5" aria-label="CIPSA Logo">
+            <div className="flex items-center gap-3" aria-label="CIPSA Logo">
               <img
                 src={`${import.meta.env.BASE_URL}favicon.svg`}
                 alt="CIPSA Logo"
-                className="h-7 w-auto block object-contain"
+                className="h-9 w-auto block object-contain"
               />
-              <span className="text-base font-bold text-[var(--text-primary)] leading-none tracking-tight">CIPSA</span>
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-bold text-[var(--text-primary)] tracking-tight">CIPSA</span>
+                <span className="text-[10px] font-medium text-[var(--text-tertiary)] tracking-wider uppercase">Price Audit</span>
+              </div>
             </div>
 
             <div className="relative">

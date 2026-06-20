@@ -421,35 +421,84 @@ Haga clic en los encabezados de columna para ordenar:
 
 ---
 
-## Anexo: Atajos para Diapositivas
+---
 
-### Resumen Visual por Secciones
+## Anexo: Guía para Creación de Diapositivas
 
-**Sección 1: Introducción (2-3 diapositivas)**
-- Qué es CIPSA
-- Beneficios principales
-- Requisitos del sistema
+### Estructura Recomendada (18-22 diapositivas)
 
-**Sección 2: Análisis Competitivo (5-7 diapositivas)**
-- Flujo de trabajo
-- Datos generales
-- Búsqueda de productos
-- Tabla de comparación
-- Dashboard y gráficos
-- Exportación
+#### Bloque 1: Introducción (3 diapositivas)
 
-**Sección 3: Calculadora de Márgenes (3-4 diapositivas)**
-- Flujo de trabajo
-- Tabla de márgenes
-- Fórmulas
-- Aplicación global
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 1 | **Portada** | G360 Price Audit — Análisis Estratégico de Precios. Logotipo CIPSA + G360 |
+| 2 | **Problema** | Levantamiento manual en campo, datos dispersos en Excel, falta de visibilidad de rentabilidad en tiempo real |
+| 3 | **Solución** | Aplicación web corporativa que unifica captura, simulación y exportación en un solo flujo |
 
-**Sección 4: Exportación (2-3 diapositivas)**
-- Tipos de exportación
-- Pasos para cada formato
-- Ejemplos visuales
+#### Bloque 2: Arquitectura (2 diapositivas)
+
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 4 | **Tech Stack** | React 19 + TypeScript 5.9 + Vite 7 + Tailwind 3.4 + Zustand + Recharts |
+| 5 | **Ecosistema G360** | Familia de microherramientas, skill `corporativo-g360`, CLI de scaffolding |
+
+#### Bloque 3: Funcionalidades Core (7 diapositivas)
+
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 6 | **Comparador — Datos Generales** | Formulario: Documento, Cliente, Sucursal, Fecha, Marcas (hasta 5 competidores) |
+| 7 | **Comparador — Búsqueda** | Búsqueda por código/EAN/nombre, selección múltiple, filtro por línea |
+| 8 | **Comparador — Tabla** | Columnas editables, variaciones porcentuales automáticas, precio promedio y sugerido |
+| 9 | **Dashboard Visual** | Gráficos: BrandRankingChart (barras), PricePieChart (pastel), KPIs, Win Rate |
+| 10 | **Simulador de Márgenes** | Slide-over: costo actual, Propuesta 1 (mismo costo), Propuesta 2 (nuevo costo + precio) |
+| 11 | **Ranking Automático** | 1 + competidores con precio menor. Fórmula Excel nativa en exportación |
+| 12 | **Carga Masiva** | Plantilla Excel para importar cientos de registros en segundos |
+
+#### Bloque 4: Exportación (3 diapositivas)
+
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 13 | **Exportación XLSX** | Un solo archivo con Comparador + Margen. Celdas editables (fondo amarillo) |
+| 14 | **Fórmulas Vivas** | Ranking, margen, dif. costo, impacto % — se recalculan en Excel |
+| 15 | **Tablero Estratégico** | Hoja 2: Costo fábrica, Margen de Protección, Semáforo de Alerta |
+
+#### Bloque 5: Modelo de Negocio (2 diapositivas)
+
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 16 | **Cadena de Valor** | Fabricante → Mayorista → Tienda. Rol del vendedor en el centro |
+| 17 | **Fórmulas** | Margen %, Markup %, Ranking, Impacto %. Casos prácticos con números |
+
+#### Bloque 6: Demo y Cierre (3-4 diapositivas)
+
+| # | Título | Contenido Clave |
+|---|--------|-----------------|
+| 18 | **Demo en Vivo** | Flujo completo: login → datos → búsqueda → precios → simulación → exportación |
+| 19 | **Roadmap** | Próximas features: dashboard web, integración ERP, app móvil |
+| 20 | **Q&A** | Preguntas frecuentes y contacto |
+
+### Tips Visuales para Diapositivas
+
+| Aspecto | Recomendación |
+|---------|---------------|
+| **Fondo** | Usar el dark mode de la app (`#0c1929`) para capturas más profesionales. Las cards tienen glow neón en modo oscuro |
+| **Gráficos** | Los BrandRankingChart y PricePieChart usan: naranja `#f97316` (Mi Marca Vinifan), rojo `#e11d48`, verde `#059669`, teal `#0d9488`, púrpura `#7c3aed` |
+| **Código** | Mostrar ejemplos de JSON del catálogo y fórmulas Excel en bloques de código |
+| **Flujo** | Diagrama `Comparador → Slide-over → Informe → XLSX` en cada transición |
+| **Consistencia** | Mantener colores corporativos: Azul Marino (primario), Naranja Vinifan (Mi Marca), Rojo CIPSA (acento), Gris Corporativo (secundario) |
+
+### Script Sugerido (por diapositiva)
+
+**Diapositiva 1** — "Hoy les presentamos G360 Price Audit, una herramienta corporativa para el análisis estratégico de precios, diseñada para transformar la forma en que levantamos y analizamos información de mercado."
+
+**Diapositiva 6** — "Comenzamos con el Comparador. El usuario ingresa datos generales del cliente: documento, razón social, sucursal y hasta 5 marcas competidoras. La Marca 1 es siempre nuestra marca, el baseline de comparación."
+
+**Diapositiva 10** — "El Simulador de Márgenes es el corazón de la herramienta. Con un clic en el botón Calculadora de cualquier producto, se despliega un panel lateral que permite modelar dos escenarios comerciales."
+
+**Diapositiva 13** — "La exportación genera un archivo XLSX con fórmulas vivas. El usuario puede editar precios y costos directamente en Excel y las fórmulas se recalculan automáticamente. Las celdas editables tienen fondo amarillo para identificarlas."
 
 ---
 
-*Manual de Usuario v1.0*
-*© 2025-2026 CIPSA - Desarrollado por Carlos Cusi con asistencia de IA*
+*Manual de Usuario v2.0 — Versión para presentaciones*
+*© 2025-2026 CIPSA — Desarrollado por Carlos Cusi con asistencia de IA*
+*Parte del ecosistema G360*

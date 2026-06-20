@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-glow-top" style={{ backgroundColor: 'var(--bg-primary)' }}>
 
       <a
         href="#main-content"
@@ -155,29 +155,33 @@ const LoginPage: React.FC = () => {
         Ir al contenido principal
       </a>
 
-      {/* Decorative blurs - using navy tones */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.04] blur-[120px]" style={{ backgroundColor: 'var(--color-primary-500)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.04] blur-[120px]" style={{ backgroundColor: 'var(--color-secondary-800)' }} aria-hidden="true"></div>
+      {/* Decorative blurs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.07] blur-[130px]" style={{ backgroundColor: 'var(--color-primary-500)' }} aria-hidden="true"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full opacity-[0.06] blur-[130px]" style={{ backgroundColor: 'var(--color-secondary-800)' }} aria-hidden="true"></div>
+      <div className="absolute top-[30%] right-[5%] w-[30%] h-[30%] rounded-full opacity-[0.04] blur-[100px]" style={{ backgroundColor: 'var(--color-accent-500)' }} aria-hidden="true"></div>
 
       {/* Decorative shapes */}
-      <div className="absolute top-[15%] right-[10%] w-24 h-24 border-2 rounded-2xl rotate-45 opacity-20" style={{ borderColor: 'var(--color-primary-200)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[20%] left-[8%] w-16 h-16 border-2 rounded-full opacity-15" style={{ borderColor: 'var(--color-secondary-300)' }} aria-hidden="true"></div>
-      <div className="absolute top-[40%] left-[5%] w-12 h-12 rounded-lg rotate-12 opacity-15" style={{ backgroundColor: 'var(--color-primary-100)' }} aria-hidden="true"></div>
+      <div className="absolute top-[12%] right-[12%] w-28 h-28 border-2 rounded-2xl rotate-45 opacity-25" style={{ borderColor: 'var(--color-primary-300)' }} aria-hidden="true"></div>
+      <div className="absolute bottom-[18%] left-[10%] w-20 h-20 border-2 rounded-full opacity-20" style={{ borderColor: 'var(--color-accent-200)' }} aria-hidden="true"></div>
+      <div className="absolute top-[35%] left-[4%] w-14 h-14 rounded-xl rotate-12 opacity-20" style={{ backgroundColor: 'var(--color-primary-200)' }} aria-hidden="true"></div>
+      <div className="absolute bottom-[35%] right-[6%] w-10 h-10 rounded-lg rotate-[30deg] opacity-15" style={{ backgroundColor: 'var(--color-accent-100)' }} aria-hidden="true"></div>
+      <div className="absolute top-[60%] left-[15%] w-6 h-6 rounded-full opacity-10" style={{ backgroundColor: 'var(--color-primary-400)' }} aria-hidden="true"></div>
+      <div className="absolute bottom-[25%] right-[20%] w-8 h-8 border rounded-md rotate-[45deg] opacity-15" style={{ borderColor: 'var(--color-secondary-300)' }} aria-hidden="true"></div>
 
       <div className="w-full max-w-md relative z-10 animate-fade-in" role="region" aria-label="Formulario de inicio de sesión">
-        <div className="glass-card overflow-hidden" style={{ boxShadow: '0 20px 50px rgba(6, 17, 48, 0.35)' }}>
+        <div className="glass-card card-neon overflow-hidden" style={{ boxShadow: '0 20px 50px rgba(6, 17, 48, 0.35)' }}>
 
           {/* ========================================
-              HEADER - Dark Navy background para contraste con logo rojo
+              HEADER - Dark Navy background con gradiente
               ======================================== */}
-          <div className="px-8 py-24 text-center relative overflow-hidden" style={{ 
+          <div className="px-8 py-24 text-center relative overflow-hidden header-neon-bottom" style={{ 
             background: 'linear-gradient(135deg, var(--color-primary-800) 0%, var(--color-secondary-900) 100%)',
             borderBottom: '1px solid rgba(255,255,255,0.08)'
           }}>
             <div className="absolute inset-0 opacity-[0.06] login-grid-pattern" aria-hidden="true"></div>
             <div className="relative z-10">
               <div 
-                className="w-28 h-28 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8 p-6 transition-all duration-500 hover:translate-y-[-4px]" 
+                className="w-28 h-28 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8 p-6 transition-all duration-500 hover:translate-y-[-4px] glow-accent" 
                 style={{ 
                   boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,255,255,0.1)',
                   borderBottom: '4px solid var(--color-accent-500)'
@@ -223,7 +227,7 @@ const LoginPage: React.FC = () => {
                     name="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="input focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
+                    className="input input-neon focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
                     style={{
                       borderColor: errors.name ? 'var(--color-error-500)' : 'var(--border-primary)',
                       boxShadow: errors.name ? '0 0 0 3px var(--color-input-tint-error-ring)' : undefined
@@ -254,7 +258,7 @@ const LoginPage: React.FC = () => {
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
+                    className="input input-neon focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
                     style={{
                       borderColor: errors.email ? 'var(--color-error-500)' : 'var(--border-primary)',
                       boxShadow: errors.email ? '0 0 0 3px var(--color-input-tint-error-ring)' : undefined
@@ -277,7 +281,7 @@ const LoginPage: React.FC = () => {
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="w-full btn py-3.5 text-base font-bold uppercase tracking-wide border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-400)] focus:ring-offset-2 transition-all active:scale-[0.98]"
+                className="w-full btn btn-neon py-3.5 text-base font-bold uppercase tracking-wide border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-400)] focus:ring-offset-2 transition-all active:scale-[0.98]"
                 style={{
                   backgroundColor: 'var(--color-primary-500)',
                   color: 'var(--color-btn-primary-text)',
