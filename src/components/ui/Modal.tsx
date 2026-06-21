@@ -100,7 +100,7 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}
+        style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
         onClick={onClose}
         aria-hidden="true"
       />

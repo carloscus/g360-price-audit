@@ -10,7 +10,6 @@ import { useToast } from '../contexts/ToastContext';
 import { SearchInput } from '../components/ui/SearchInput';
 import { ProductAnalysisCardWithBarChartRefactor } from '../components/comparador/ProductAnalysisCardWithBarChartRefactor';
 import { ProductPieChartModal } from '../components/comparador/ProductPieChartModal';
-import PricePieChart from '../components/comparador/PricePieChart';
 import { BrandRankingChart } from '../components/comparador/BrandRankingChart';
 import { getBrandColor } from '../utils/colorScheme';
 import { PieChart as PieChartIcon, Download, RefreshCw, Search, BarChart3, Trophy, TrendingDown, TrendingUp, Target } from 'lucide-react';

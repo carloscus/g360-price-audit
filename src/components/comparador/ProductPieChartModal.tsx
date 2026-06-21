@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ComparisonTableRow } from '../../interfaces';
 import { Modal } from '../ui';
-import PricePieChart from './PricePieChart';
+import PriceBarChart from './PricePieChart';
 
 interface ProductPieChartModalProps {
   product: ComparisonTableRow | null;
@@ -16,20 +16,15 @@ export const ProductPieChartModal: React.FC<ProductPieChartModalProps> = ({ prod
     <Modal
       isOpen={!!product}
       onClose={onClose}
-      title={`Gráfico de Precios - ${product.nombre || ''}`}
-      size="lg"
-      aria-describedby="pie-chart-instruction"
+      title={`${product.nombre || ''}`}
+      size="md"
     >
-      <div id="pie-chart-instruction" className="sr-only">
-        Gráfico circular interactivo de distribución de precios. Use las teclas de flecha para navegar por las porciones.
-      </div>
-      <PricePieChart
+      <PriceBarChart
         data={competidores.map(comp => ({
           name: comp,
           value: product.precios?.[comp] ?? 0
-        })).filter(item => item.value > 0)}
-        title={`Distribución de Precios para ${product.nombre}`}
-        aria-label={`Gráfico circular de distribución de precios para ${product.nombre}`}
+        }))}
+        aria-label={`Gráfico de barras de precios para ${product.nombre}`}
       />
     </Modal>
   );
