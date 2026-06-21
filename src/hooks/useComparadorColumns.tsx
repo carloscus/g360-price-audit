@@ -36,7 +36,7 @@ const CompactComparisonBar = ({ percentage }: { percentage: string | undefined }
   return (
     <div className="flex items-center gap-1.5 w-full mt-0.5">
       <span className={`text-xs font-semibold ${textColorClass} whitespace-nowrap`}>
-        {value > 0 ? '+' : ''}{value.toFixed(1)}%
+        {value > 0 ? '+' : ''}{value.toFixed(2)}%
       </span>
       <div className="h-1.5 flex-1 bg-[var(--border-secondary)] rounded-full overflow-hidden">
         <div className={`h-full ${colorClass} transition-all duration-500 ease-out`} style={{ width }} />

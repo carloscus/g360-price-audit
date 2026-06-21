@@ -88,8 +88,8 @@ export const MarginSlideOver: React.FC<MarginSlideOverProps> = ({
     ([brand, price]) => {
       const difS = draft.precioTienda !== null && price !== null
         ? draft.precioTienda - price : null;
-      const difPct = draft.precioTienda !== null && price !== null && draft.precioTienda > 0
-        ? ((draft.precioTienda - price) / draft.precioTienda) * 100 : null;
+      const difPct = draft.precioTienda !== null && price !== null && price > 0
+        ? ((draft.precioTienda / price) - 1) * 100 : null;
       return { brand, price, difS, difPct };
     },
   );
@@ -200,7 +200,7 @@ export const MarginSlideOver: React.FC<MarginSlideOverProps> = ({
                             : 'text-[var(--text-tertiary)]'
                         : 'text-[var(--text-tertiary)]'}`}>
                         {comp.difPct !== null
-                          ? `${comp.difPct > 0 ? '+' : ''}${comp.difPct.toFixed(1)}%`
+                          ? `${comp.difPct > 0 ? '+' : ''}${comp.difPct.toFixed(2)}%`
                           : '—'}
                       </td>
                     </tr>

@@ -129,7 +129,7 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
                       />
                       {price.percentage && (
                         <span className={`absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-bold px-1 py-0.5 rounded shadow-sm whitespace-nowrap ${parseFloat(price.percentage) < 0 ? 'bg-[var(--color-success-500)] text-[var(--color-text-inverse)]' : 'bg-[var(--color-error-500)] text-[var(--color-text-inverse)]'}`}>
-                          {parseFloat(price.percentage) < 0 ? '▼' : '▲'}{parseFloat(price.percentage) < 0 ? Math.abs(parseFloat(price.percentage)).toFixed(1) : (parseFloat(price.percentage)).toFixed(1)}%
+                          {parseFloat(price.percentage) < 0 ? '▼' : '▲'}{parseFloat(price.percentage) < 0 ? Math.abs(parseFloat(price.percentage)).toFixed(2) : (parseFloat(price.percentage)).toFixed(2)}%
                         </span>
                       )}
                     </div>
@@ -159,13 +159,13 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
                 <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Brecha</span>
               </div>
               <div className={`text-lg sm:text-xl font-bold font-mono leading-none ${avgGap < 0 ? 'text-[var(--color-on-surface-success)]' : avgGap > 0 ? 'text-[var(--color-on-surface-error)]' : 'text-[var(--text-tertiary)]'}`}>
-                {avgGap < 0 ? `▼ ${Math.abs(avgGap).toFixed(1)}%` : avgGap > 0 ? `▲ +${avgGap.toFixed(1)}%` : '0.0%' }
+                {avgGap < 0 ? `▼ ${Math.abs(avgGap).toFixed(2)}%` : avgGap > 0 ? `▲ +${avgGap.toFixed(2)}%` : '0.00%' }
               </div>
             </div>
 
             {/* Bottom Row - Volatilidad, Mejor, Peor */}
             <div className="grid grid-cols-3 gap-1.5">
-              <InfoBlock label="Volat." value={`${priceVolatility.toFixed(1)}%`} mono light compact />
+              <InfoBlock label="Volat." value={`${priceVolatility.toFixed(2)}%`} mono light compact />
               <InfoBlock label="Mejor" value={bestDiff ? formatPercentageWithIndicator(bestDiff.percentage) : '-'} variant="success" compact />
               <InfoBlock label="Peor" value={worstDiff ? formatPercentageWithIndicator(worstDiff.percentage) : '-'} variant="danger" compact />
             </div>
