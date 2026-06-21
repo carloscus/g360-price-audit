@@ -99,7 +99,7 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
   const worksheet = workbook.addWorksheet(sheet1Name);
 
   const currencyFormat = '#,##0.00';
-  const percentageFormat = '0.0%';
+  const percentageFormat = '0.00%';
 
   const marcasValidas = data.marcas.filter(m => m && m.trim() !== '');
   const numMarcas = marcasValidas.length;
