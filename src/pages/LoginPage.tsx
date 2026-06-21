@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/auth';
+import { MeshGradient, GrainyBackground } from '../components/ui/VisualEffects';
+import { LogIn, User, Mail, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 const LoginPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -146,7 +150,8 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-glow-top" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <GrainyBackground className="flex items-center justify-center p-4 relative overflow-hidden bg-glow-top min-h-screen">
+      <MeshGradient />
 
       <a
         href="#main-content"
@@ -155,33 +160,22 @@ const LoginPage: React.FC = () => {
         Ir al contenido principal
       </a>
 
-      {/* Decorative blurs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.07] blur-[130px]" style={{ backgroundColor: 'var(--color-primary-500)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[55%] h-[55%] rounded-full opacity-[0.06] blur-[130px]" style={{ backgroundColor: 'var(--color-secondary-800)' }} aria-hidden="true"></div>
-      <div className="absolute top-[30%] right-[5%] w-[30%] h-[30%] rounded-full opacity-[0.04] blur-[100px]" style={{ backgroundColor: 'var(--color-accent-500)' }} aria-hidden="true"></div>
-
-      {/* Decorative shapes */}
-      <div className="absolute top-[12%] right-[12%] w-28 h-28 border-2 rounded-2xl rotate-45 opacity-25" style={{ borderColor: 'var(--color-primary-300)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[18%] left-[10%] w-20 h-20 border-2 rounded-full opacity-20" style={{ borderColor: 'var(--color-accent-200)' }} aria-hidden="true"></div>
-      <div className="absolute top-[35%] left-[4%] w-14 h-14 rounded-xl rotate-12 opacity-20" style={{ backgroundColor: 'var(--color-primary-200)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[35%] right-[6%] w-10 h-10 rounded-lg rotate-[30deg] opacity-15" style={{ backgroundColor: 'var(--color-accent-100)' }} aria-hidden="true"></div>
-      <div className="absolute top-[60%] left-[15%] w-6 h-6 rounded-full opacity-10" style={{ backgroundColor: 'var(--color-primary-400)' }} aria-hidden="true"></div>
-      <div className="absolute bottom-[25%] right-[20%] w-8 h-8 border rounded-md rotate-[45deg] opacity-15" style={{ borderColor: 'var(--color-secondary-300)' }} aria-hidden="true"></div>
-
-      <div className="w-full max-w-md relative z-10 animate-fade-in" role="region" aria-label="Formulario de inicio de sesión">
-        <div className="glass-card card-neon overflow-hidden" style={{ boxShadow: '0 20px 50px rgba(6, 17, 48, 0.35)' }}>
+      <div className="w-full max-w-5xl relative z-10 animate-fade-in" role="region" aria-label="Formulario de inicio de sesión">
+        <div className="glass-card card-neon overflow-hidden border-white/20 dark:border-white/10 flex flex-col lg:flex-row" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
 
           {/* ========================================
-              HEADER - Dark Navy background con gradiente
+              LEFT PANEL - Logo/Branding (hidden on mobile)
               ======================================== */}
-          <div className="px-8 py-24 text-center relative overflow-hidden header-neon-bottom" style={{ 
+          <div className="hidden lg:flex lg:w-5/12 px-8 py-16 text-center relative overflow-hidden items-center justify-center" style={{ 
             background: 'linear-gradient(135deg, var(--color-primary-800) 0%, var(--color-secondary-900) 100%)',
-            borderBottom: '1px solid rgba(255,255,255,0.08)'
           }}>
             <div className="absolute inset-0 opacity-[0.06] login-grid-pattern" aria-hidden="true"></div>
             <div className="relative z-10">
-              <div 
-                className="w-28 h-28 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8 p-6 transition-all duration-500 hover:translate-y-[-4px] glow-accent" 
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="w-28 h-28 mx-auto bg-white rounded-3xl flex items-center justify-center mb-6 p-5 glow-accent" 
                 style={{ 
                   boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,255,255,0.1)',
                   borderBottom: '4px solid var(--color-accent-500)'
@@ -193,17 +187,46 @@ const LoginPage: React.FC = () => {
                   alt="CIPSA Logo" 
                   className="w-full h-full object-contain" 
                 />
-              </div>
-              <h1 className="text-6xl font-black text-white mb-2 tracking-tighter drop-shadow-sm" id="login-title">CIPSA</h1>
-              <div className="h-1.5 w-12 mx-auto mb-5 rounded-full" style={{ backgroundColor: 'var(--color-accent-500)' }}></div>
-              <p className="text-[11px] font-black uppercase tracking-[0.6em] opacity-90" style={{ color: 'var(--color-secondary-200)' }}>Análisis de Precios</p>
+              </motion.div>
+              <motion.h1 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-5xl font-black text-white mb-2 tracking-tighter drop-shadow-md" 
+                id="login-title"
+              >
+                CIPSA
+              </motion.h1>
+              <motion.div 
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="h-1 w-16 mx-auto mb-4 rounded-full origin-center" 
+                style={{ backgroundColor: 'var(--color-accent-500)' }}
+              ></motion.div>
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="text-xs font-bold uppercase tracking-[0.4em] text-blue-200/80"
+              >
+                Análisis de Precios
+              </motion.p>
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="mt-8 text-sm text-blue-200/60 leading-relaxed max-w-xs mx-auto"
+              >
+                Plataforma inteligente de monitoreo y comparación de precios para la toma de decisiones comerciales.
+              </motion.p>
             </div>
           </div>
 
           {/* ========================================
-              FORMULARIO
+              RIGHT PANEL - Form
               ======================================== */}
-          <div className="px-8 py-10" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+          <div className="w-full lg:w-7/12 px-8 py-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
             <div
               role="status"
               aria-live="polite"
@@ -214,11 +237,38 @@ const LoginPage: React.FC = () => {
               {message || rateLimitError || ''}
             </div>
 
+            {/* Mobile header (visible only on small screens) */}
+            <div className="lg:hidden text-center mb-8">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="w-20 h-20 mx-auto bg-white rounded-2xl flex items-center justify-center mb-4 p-4 shadow-lg" 
+                style={{ 
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.15), 0 0 0 3px rgba(255,255,255,0.1)',
+                  borderBottom: '3px solid var(--color-accent-500)'
+                }}
+                aria-hidden="true"
+              >
+                <img 
+                  src={`${import.meta.env.BASE_URL}favicon.svg`} 
+                  alt="CIPSA Logo" 
+                  className="w-full h-full object-contain" 
+                />
+              </motion.div>
+              <h2 className="text-2xl font-black text-[var(--text-primary)] mb-1">CIPSA</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--text-tertiary)]">Análisis de Precios</p>
+            </div>
+
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Bienvenido</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-8">Ingrese sus credenciales corporativas para acceder</p>
+
             <form onSubmit={handleLogin} className="space-y-6" noValidate>
 
               <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Nombre Completo <span style={{ color: 'var(--color-error-500)' }}>*</span>
+                <label htmlFor="name" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-secondary-500)]">
+                  <User size={14} className="text-[var(--color-primary-500)]" />
+                  Nombre Completo <span className="text-[var(--color-accent-500)]">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -227,11 +277,10 @@ const LoginPage: React.FC = () => {
                     name="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="input input-neon focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
-                    style={{
-                      borderColor: errors.name ? 'var(--color-error-500)' : 'var(--border-primary)',
-                      boxShadow: errors.name ? '0 0 0 3px var(--color-input-tint-error-ring)' : undefined
-                    }}
+                    className={cn(
+                      "input input-neon focus:ring-2 focus:ring-[var(--color-primary-500)]/20",
+                      errors.name ? "border-[var(--color-accent-500)] bg-[var(--color-accent-50)]/50" : "border-[var(--color-secondary-200)] dark:border-[var(--color-secondary-700)] bg-white/50"
+                    )}
                     placeholder="Ingrese su nombre completo"
                     disabled={isLoading}
                     aria-describedby={errors.name ? "name-error" : undefined}
@@ -239,8 +288,8 @@ const LoginPage: React.FC = () => {
                     autoComplete="name"
                   />
                   {errors.name && (
-                    <p className="mt-1.5 text-sm flex items-center" style={{ color: 'var(--color-error-600)' }} id="name-error" role="alert">
-                      <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                    <p className="mt-1.5 text-xs flex items-center font-medium text-[var(--color-accent-600)]" id="name-error" role="alert">
+                      <AlertCircle size={12} className="mr-1" />
                       {errors.name}
                     </p>
                   )}
@@ -248,8 +297,9 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Correo Corporativo <span style={{ color: 'var(--color-error-500)' }}>*</span>
+                <label htmlFor="email" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-secondary-500)]">
+                  <Mail size={14} className="text-[var(--color-primary-500)]" />
+                  Correo Corporativo <span className="text-[var(--color-accent-500)]">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -258,11 +308,10 @@ const LoginPage: React.FC = () => {
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input input-neon focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]"
-                    style={{
-                      borderColor: errors.email ? 'var(--color-error-500)' : 'var(--border-primary)',
-                      boxShadow: errors.email ? '0 0 0 3px var(--color-input-tint-error-ring)' : undefined
-                    }}
+                    className={cn(
+                      "input input-neon focus:ring-2 focus:ring-[var(--color-primary-500)]/20",
+                      errors.email ? "border-[var(--color-accent-500)] bg-[var(--color-accent-50)]/50" : "border-[var(--color-secondary-200)] dark:border-[var(--color-secondary-700)] bg-white/50"
+                    )}
                     placeholder={`usuario${requiredDomain}`}
                     disabled={isLoading}
                     aria-describedby={errors.email ? "email-error" : undefined}
@@ -270,75 +319,88 @@ const LoginPage: React.FC = () => {
                     autoComplete="email"
                   />
                   {errors.email && (
-                    <p className="mt-1.5 text-sm flex items-center" style={{ color: 'var(--color-error-600)' }} id="email-error" role="alert">
-                      <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                    <p className="mt-1.5 text-xs flex items-center font-medium text-[var(--color-accent-600)]" id="email-error" role="alert">
+                      <AlertCircle size={12} className="mr-1" />
                       {errors.email}
                     </p>
                   )}
                 </div>
               </div>
 
-              <button 
+              <motion.button
                 type="submit"
                 disabled={isLoading}
-                className="w-full btn btn-neon py-3.5 text-base font-bold uppercase tracking-wide border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-400)] focus:ring-offset-2 transition-all active:scale-[0.98]"
-                style={{
-                  backgroundColor: 'var(--color-primary-500)',
-                  color: 'var(--color-btn-primary-text)',
-                  boxShadow: '0 4px 14px rgba(26, 86, 219, 0.35)'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading) {
-                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-primary-500)';
-                  e.currentTarget.style.transform = 'none';
-                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full btn btn-neon py-4 text-sm font-black uppercase tracking-widest border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2 bg-[var(--color-primary-600)] text-white shadow-[0_10px_15px_-3px_rgba(21,68,176,0.3)] relative overflow-hidden"
                 aria-describedby="login-instruction"
                 aria-busy={isLoading}
               >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                    <span>Iniciando sesión...</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                    <span>Iniciar Sesión</span>
-                  </span>
-                )}
-              </button>
-              <div id="login-instruction" className="sr-only">
-                Presione Enter o haga clic para iniciar sesión. El formulario requiere nombre completo y correo corporativo.
-              </div>
+                <AnimatePresence mode="popLayout">
+                  {isLoading ? (
+                    <motion.span
+                      key="loading"
+                      initial={{ x: -80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 80, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: 'easeOut' }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                      <span>Iniciando...</span>
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="idle"
+                      initial={{ x: -80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 80, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: 'easeOut' }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <LogIn size={18} />
+                      <span>Iniciar Sesión</span>
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             </form>
 
             {rateLimitError && (
-              <div className="mt-6 p-4 rounded-lg border flex items-center gap-3 animate-fade-in" style={{
-                borderColor: 'var(--color-warning-200)',
-                backgroundColor: 'var(--color-warning-50)',
-                color: 'var(--color-warning-800)'
-              }} role="alert" aria-live="assertive">
-                <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                <p className="text-sm font-medium">{rateLimitError}</p>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 p-4 rounded-xl border flex items-center gap-3 border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800/50 dark:text-amber-300" 
+                role="alert" 
+                aria-live="assertive"
+              >
+                <ShieldAlert size={20} className="flex-shrink-0" />
+                <p className="text-xs font-semibold leading-relaxed">{rateLimitError}</p>
+              </motion.div>
             )}
 
             {message && (
-              <div className={`mt-6 p-4 rounded-lg border flex items-center gap-3 animate-fade-in ${messageBorderColor} ${messageTextColor}`} role="status" aria-live="polite">
-                {messageIcon}
-                <p className="text-sm font-medium">{message}</p>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn(
+                  "mt-6 p-4 rounded-xl border flex items-center gap-3",
+                  message.includes('Error') 
+                    ? "border-red-200 bg-red-50 text-red-800 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-300"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800/50 dark:text-emerald-300"
+                )} 
+                role="status" 
+                aria-live="polite"
+              >
+                {message.includes('Error') ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
+                <p className="text-xs font-semibold leading-relaxed">{message}</p>
+              </motion.div>
             )}
           </div>
 
-          </div>
+        </div>
       </div>
-    </div>
+    </GrainyBackground>
   );
 };
 

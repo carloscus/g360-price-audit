@@ -126,7 +126,7 @@ export const useComparadorColumns = ({
 	return [
 		{ header: 'Código', accessor: 'codigo', cellClassName: 'w-16 text-sm text-[var(--text-primary)] column-frozen-1', headerClassName: 'column-frozen-1', sortable: true, onSort, cellRenderer: (item) => (
 			<div className="flex flex-col gap-0.5">
-				<span className="font-mono text-xs font-bold" style={{ color: 'var(--color-primary-500)' }}>{item.codigo}</span>
+				<span className="font-mono text-xs font-bold" style={{ color: 'var(--color-sku-accent)' }}>{item.codigo}</span>
 				<span className="text-[11px] leading-tight nombre-inline sm:hidden line-clamp-2" style={{ color: 'var(--text-tertiary)' }}>{item.nombre}</span>
 			</div>
 		) },
