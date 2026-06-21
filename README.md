@@ -252,7 +252,34 @@ Un solo archivo con **Comparador + Margen** en la misma hoja:
 - **Fórmulas vivas**: ranking, margen, dif. costo, impacto % — se recalculan al editar en Excel
 - **Ranking**: Fórmula `IF(AND(comp<>"",comp<miPrecio),1,0)` por competidor
 
-### 5. Tablero Estratégico (Hoja 2)
+### 5. Carga Masiva de Productos
+
+Permite importar decenas de productos con sus precios en segundos usando una plantilla Excel.
+
+**Cómo funciona:**
+
+1. **Requisito**: Debe tener al menos 2 marcas configuradas en Datos Generales
+2. **Descargar plantilla**: Haga clic en "Plantilla" para obtener el archivo Excel
+3. **Llenar el Excel**:
+
+   | SKU | PRECIO_TIENDA | PRECIO_<MARCA2> | PRECIO_<MARCA3> | ... |
+   |-----|---------------|-----------------|-----------------|-----|
+   | Código del producto | Precio en tu marca (M1) | Precio competidor 2 | Precio competidor 3 | ... |
+
+   - `SKU`: código del producto (debe existir en el catálogo)
+   - `PRECIO_TIENDA`: se mapea automáticamente a tu marca (Marca 1)
+   - `PRECIO_<MARCA>`: columnas dinámicas según los nombres de marca configurados
+   - Si hay marcas duplicadas se generan sufijos numéricos (ej. `PRECIO_VINIFAN2`)
+
+4. **Importar**: Haga clic en "Cargar Excel" y seleccione el archivo
+5. **Resultado**: Los productos aparecen en la tabla con sus precios. Los precios existentes se conservan y se mezclan con los nuevos
+
+**Notas:**
+- Solo se importan productos que existen en el catálogo (por SKU)
+- Los valores numéricos aceptan tanto `0` como `0.00`
+- La columna SKU debe estar en formato texto si tiene ceros a la izquierda
+
+### 6. Tablero Estratégico (Hoja 2)
 
 - **Costo Fábrica vs Mayorista**: Utilidad real empresa vs utilidad punto de venta
 - **Margen de Protección**: Casilla dinámica (C2) para umbral de rentabilidad

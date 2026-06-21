@@ -21,6 +21,11 @@ export const BulkImportButton: React.FC = () => {
       formState.marca5,
     ].filter((m): m is string => !!m);
 
+    if (marcas.length < 2) {
+      addToast('Debe configurar al menos 2 marcas en Datos Generales para generar la plantilla.', 'error');
+      return;
+    }
+
     const blob = await generateBulkUploadTemplate(marcas);
     downloadBlob(blob, 'plantilla_carga_masiva.xlsx');
     addToast('Plantilla descargada. Complete los SKUs y precios.', 'info');

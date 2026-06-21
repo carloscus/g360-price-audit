@@ -217,8 +217,11 @@ export const useAppStore = create<State & Actions>()(
       },
 
       importarProductosMasivamente: (rows) => {
-        const { catalogo, listas } = get();
+        const { catalogo, listas, formState } = get();
         const currentList = [...listas.precios];
+
+        // Determinar la marca 1 (PRECIO_TIENDA en el Excel se mapea a esta marca)
+        const marca1 = (formState.precios.marca1 || '').trim().toLowerCase();
         
         rows.forEach(row => {
           // Buscar producto en catálogo por SKU (codigo)
@@ -231,14 +234,21 @@ export const useAppStore = create<State & Actions>()(
           // Mapear precios dinámicos según las columnas del Excel
           Object.entries(row).forEach(([key, val]) => {
             if (key.startsWith('PRECIO_') && val !== null && val !== undefined) {
-              const brandName = key.replace('PRECIO_', '').replace(/_/g, ' ');
+              const brandName = key.replace('PRECIO_', '').replace(/_/g, ' ').toLowerCase().trim();
               preciosNuevos[brandName] = Number(val);
             }
           });
 
+          // PRECIO_TIENDA se mapea a la marca 1 (ej. vinifan)
+          if (marca1 && row.PRECIO_TIENDA !== null && row.PRECIO_TIENDA !== undefined) {
+            preciosNuevos[marca1] = Number(row.PRECIO_TIENDA);
+          }
+
+          // Preservar precios existentes y mergear los nuevos
+          const preciosExistentes = existingIdx > -1 ? currentList[existingIdx].precios || {} : {};
           const productoEditado: IProductoEditado = {
             ...(existingIdx > -1 ? currentList[existingIdx] : { ...product, cantidad: 1, observaciones: '', precios: {} }),
-            precios: { ...preciosNuevos }
+            precios: { ...preciosExistentes, ...preciosNuevos }
           };
 
           if (existingIdx > -1) {

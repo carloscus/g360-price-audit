@@ -50,12 +50,25 @@ export async function generateBulkUploadTemplate(marcas: string[]): Promise<Blob
   };
 
   // Cabeceras: SKU es el identificador único obligatorio
-  const headers = ['SKU', 'COSTO', 'PRECIO_TIENDA'];
+  const headers = ['SKU', 'PRECIO_TIENDA'];
   
   // Añadir columnas para competidores (saltamos la marca 1 que es "Mi Marca")
+  // Contar cuántas veces aparece cada marca antes del slice (marca1)
+  const before: Record<string, number> = {};
+  marcas.slice(0, 1).forEach(m => {
+    if (m && m.trim() !== '') {
+      const key = m.toUpperCase().replace(/\s+/g, '_');
+      before[key] = (before[key] || 0) + 1;
+    }
+  });
+  // Generar headers con el mismo criterio de sufijos que la vista (ComparadorPage)
+  const seen: Record<string, number> = {};
   marcas.slice(1).forEach(m => {
     if (m && m.trim() !== '') {
-      headers.push(`PRECIO_${m.toUpperCase().replace(/\s+/g, '_')}`);
+      const key = m.toUpperCase().replace(/\s+/g, '_');
+      seen[key] = (seen[key] || 0) + 1;
+      const suffix = (before[key] || 0) + seen[key];
+      headers.push(`PRECIO_${key}${suffix > 1 ? suffix : ''}`);
     }
   });
 
@@ -66,9 +79,8 @@ export async function generateBulkUploadTemplate(marcas: string[]): Promise<Blob
 
   // Ajustar anchos
   worksheet.getColumn(1).width = 15; // SKU
-  worksheet.getColumn(2).width = 12; // Costo
-  worksheet.getColumn(3).width = 18; // Precio Tienda
-  for (let i = 4; i <= headers.length; i++) worksheet.getColumn(i).width = 15;
+  worksheet.getColumn(2).width = 18; // Precio Tienda
+  for (let i = 3; i <= headers.length; i++) worksheet.getColumn(i).width = 15;
 
   const buffer = await workbook.xlsx.writeBuffer();
   return new Blob([buffer], {

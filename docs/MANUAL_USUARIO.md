@@ -12,6 +12,7 @@
 4. [Calculadora de Márgenes](#calculadora-de-márgenes)
 5. [Exportación de Informes](#exportación-de-informes)
 6. [Funciones Avanzadas](#funciones-avanzadas)
+   - [Carga Masiva (Importación por Excel)](#65-carga-masiva-importación-por-excel)
 7. [Solución de Problemas](#solución-de-problemas)
 
 ---
@@ -383,7 +384,40 @@ Haga clic en los encabezados de columna para ordenar:
 2. El cambio es instantáneo
 3. Se mantiene en futuras sesiones
 
-### 6.5 Keyboard Shortcuts
+### 6.5 Carga Masiva (Importación por Excel)
+
+Permite cargar decenas de productos con precios en segundos.
+
+**Requisito**: Debe tener al menos 2 marcas configuradas en Datos Generales.
+
+**Pasos:**
+
+1. En la sección de búsqueda, haga clic en **"Plantilla"** para descargar el archivo Excel
+2. Complete los datos:
+
+   | Columna | Descripción |
+   |---------|-------------|
+   | `SKU` | Código del producto (debe estar en catálogo). Si tiene ceros a la izquierda, formatear columna como texto |
+   | `PRECIO_TIENDA` | Precio en su marca (Marca 1). Se importa automáticamente en la columna de su marca |
+   | `PRECIO_<NOMBRE_MARCA>` | Una columna por cada competidor (Marca 2 a Marca 5). El nombre se genera desde Datos Generales |
+
+3. Guarde el archivo y haga clic en **"Cargar Excel"**
+4. Seleccione el archivo y los productos se importarán automáticamente
+
+**Comportamiento:**
+- Si un producto ya existe en la lista, sus precios se **fusionan** (no se pierden los existentes)
+- Si una marca se repite (ej. mismo nombre en Marca 2 y Marca 4), se generan sufijos automáticos: `PRECIO_VINIFAN`, `PRECIO_VINIFAN2`
+- Los valores `0` y `0.00` se reconocen igual
+- Los productos que no existen en el catálogo se **ignoran** silenciosamente
+
+**Ejemplo:**
+| SKU | PRECIO_TIENDA | PRECIO_ARTESCO | PRECIO_FABER | PRECIO_VINIFAN2 | PRECIO_VIKINGO |
+|-----|--------------|----------------|-------------|-----------------|----------------|
+| 77146 | 3.00 | 3.30 | 2.80 | 2.90 | 2.95 |
+
+→ Se importa SKU 77146 con precio **vinifan**=3.00, **artesco**=3.30, **faber**=2.80, **vinifan2**=2.90, **vikingo**=2.95
+
+### 6.6 Keyboard Shortcuts
 
 | Atajo | Acción |
 |-------|--------|
