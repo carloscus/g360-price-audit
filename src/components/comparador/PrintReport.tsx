@@ -272,7 +272,7 @@ const ProductCardPrint: React.FC<ProductCardPrintProps> = ({ item, competidores 
           </div>
           <div className="text-block-print">
             <span className="text-label-print">Posición:</span>
-            <span className="text-value-print position-badge-print">{analysis.myPosition}°</span>
+            <span className="text-value-print position-badge-print">{analysis.myPosition > 0 ? `${analysis.myPosition}°` : '—'}</span>
           </div>
           <div className="text-block-print">
             <span className="text-label-print">Total marcas:</span>

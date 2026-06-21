@@ -129,6 +129,11 @@ function getPrintStyles(): string {
     margin: 1cm;
     size: A4 portrait;
   }
+
+  /* Mantener precios visibles en el contenido del snapshot */
+  .snapshot-content .price-input-wrapper [role="button"] {
+    display: flex !important;
+  }
 }
 `;
 }
@@ -349,10 +354,10 @@ export async function generateHTMLSnapshot(
   const clone = element.cloneNode(true) as HTMLElement;
   
   // Remover elementos no deseados (botones de acción, inputs, etc.)
-  const elementsToRemove = clone.querySelectorAll('.no-export, button, input, select, textarea, [data-no-export]');
+  const elementsToRemove = clone.querySelectorAll('.no-export, .sr-only, button, input, select, textarea, [data-no-export]');
   elementsToRemove.forEach(el => el.remove());
   
-  // Convertir canvas a imágenes (para gráficos)
+  // Convertir canvas a imágenes
   const canvases = clone.querySelectorAll('canvas');
   for (const canvas of canvases) {
     try {
@@ -398,7 +403,7 @@ export async function generateMultiSectionHTMLSnapshot(
     const clone = section.element.cloneNode(true) as HTMLElement;
     
     // Remover elementos no deseados
-    const elementsToRemove = clone.querySelectorAll('.no-export, button, input, select, textarea, [data-no-export]');
+    const elementsToRemove = clone.querySelectorAll('.no-export, .sr-only, button, input, select, textarea, [data-no-export]');
     elementsToRemove.forEach(el => el.remove());
     
     // Agregar título de sección
@@ -437,7 +442,7 @@ export async function openHTMLSnapshotInNewTab(
   const clone = element.cloneNode(true) as HTMLElement;
   
   // Remover elementos no deseados
-  const elementsToRemove = clone.querySelectorAll('.no-export, button, input, select, textarea, [data-no-export]');
+  const elementsToRemove = clone.querySelectorAll('.no-export, .sr-only, button, input, select, textarea, [data-no-export]');
   elementsToRemove.forEach(el => el.remove());
   
   // Convertir canvas a imágenes
