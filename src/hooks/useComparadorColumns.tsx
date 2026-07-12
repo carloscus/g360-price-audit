@@ -4,7 +4,7 @@ import type { IColumn } from '../components/DataTable';
 import { PriceInput } from '../components/comparador/PriceInput';
 import { getBrandColorByPosition, getBrandHeaderStylesByPosition } from '../utils/colorScheme';
 import { Tooltip } from '../components/ui';
-import { PieChart as PieChartIcon, Trash2, Calculator } from 'lucide-react';
+import { DollarSign, BarChart3 as BarChartIcon, Trash2, Calculator } from 'lucide-react';
 import type { MarginProduct } from '../store/useMarginStore';
 
 interface UseComparadorColumnsParams {
@@ -14,8 +14,9 @@ interface UseComparadorColumnsParams {
   onSort: (key: string) => void;
   onBrandHover: (brandName: string | null) => void;
   onDeleteProduct: (codigo: string) => void;
-  onViewPieChart: (item: ComparisonTableRow) => void;
+  onViewChart: (item: ComparisonTableRow) => void;
   onOpenSlideOver: (item: ComparisonTableRow) => void;
+  onCostChange?: (codigo: string, valor: number | null) => void;
   marginProductos?: MarginProduct[];
 }
 
@@ -52,8 +53,9 @@ export const useComparadorColumns = ({
   onSort,
   onBrandHover,
   onDeleteProduct,
-  onViewPieChart,
+  onViewChart,
   onOpenSlideOver,
+  onCostChange,
   marginProductos,
 }: UseComparadorColumnsParams): IColumn<ComparisonTableRow>[] => {
   return useMemo((): IColumn<ComparisonTableRow>[] => {
@@ -159,6 +161,29 @@ export const useComparadorColumns = ({
 			),
 		},
 
+    ...(onCostChange ? [{
+      header: (
+        <div className="flex items-center gap-1 px-1" title="Costo (Mayorista)">
+          <DollarSign className="w-3 h-3 text-[var(--color-on-surface-success)]" />
+          <span className="text-xs font-semibold text-[var(--color-on-surface-success)]">Costo</span>
+        </div>
+      ),
+      accessor: 'costo',
+      cellClassName: 'w-24',
+      cellRenderer: (item) => {
+        const mp = marginProductos?.find(m => m.codigo === item.codigo);
+        return (
+          <PriceInput
+            initialValue={mp?.costo ?? null}
+            onPriceChange={(value) => onCostChange(item.codigo, value)}
+            competidor="costo"
+            item={item}
+            type="costo"
+          />
+        );
+      },
+    } as IColumn<ComparisonTableRow>] : []),
+
     baseColumn,
 
     ...competitorColumns,
@@ -170,13 +195,13 @@ export const useComparadorColumns = ({
         headerClassName: 'column-acciones',
   cellRenderer: (item) => (
     <div className="flex items-center gap-1">
-      <Tooltip content="Ver gráfico de torta" position="left">
+      <Tooltip content="Ver gráfico de barras" position="left">
         <button
-          onClick={() => onViewPieChart(item)}
+          onClick={() => onViewChart(item)}
           className="p-1.5 rounded-md hover:bg-[var(--color-comparador-primary)]/10 text-[var(--color-comparador-primary)] transition-all duration-200"
-          aria-label={`Ver gráfico de torta para ${item.nombre}`}
+          aria-label={`Ver gráfico de barras para ${item.nombre}`}
         >
-          <PieChartIcon className="h-4 w-4" />
+          <BarChartIcon className="h-4 w-4" />
         </button>
       </Tooltip>
               <Tooltip content="Analizar margen de ganancia" position="left">
@@ -204,5 +229,5 @@ export const useComparadorColumns = ({
   ),
       },
     ];
-  }, [competidores, highlightedBrand, onPriceChange, onSort, onBrandHover, onDeleteProduct, onViewPieChart, onOpenSlideOver, marginProductos]);
+  }, [competidores, highlightedBrand, onPriceChange, onSort, onBrandHover, onDeleteProduct, onViewChart, onOpenSlideOver, marginProductos]);
 };

@@ -137,7 +137,7 @@ async function saveDataWithTTL<T>(id: string, data: T, type: string): Promise<vo
   }
 }
 
-export async function getCatalogFromIndexedDB(): Promise<Interfaces.IProducto[] | null> {
+async function getCatalogFromIndexedDB(): Promise<Interfaces.IProducto[] | null> {
   return getDataWithTTL<Interfaces.IProducto[]>("catalog", CATALOG_CACHE_TTL);
 }
 
@@ -145,22 +145,22 @@ export async function saveCatalogToIndexedDB(catalog: Interfaces.IProducto[]): P
   return saveDataWithTTL("catalog", catalog, "catalog");
 }
 
-export interface ComparisonState {
+interface ComparisonState {
   productos: Interfaces.IProductoEditado[];
   competidores: string[];
   formData: Record<string, unknown>;
   timestamp: number;
 }
 
-export async function getComparisonState(): Promise<ComparisonState | null> {
+async function getComparisonState(): Promise<ComparisonState | null> {
   return getDataWithTTL<ComparisonState>("comparison_state", COMPARISON_STATE_TTL);
 }
 
-export async function saveComparisonState(state: Omit<ComparisonState, 'timestamp'>): Promise<void> {
+async function saveComparisonState(state: Omit<ComparisonState, 'timestamp'>): Promise<void> {
   return saveDataWithTTL("comparison_state", { ...state, timestamp: Date.now() }, "comparison");
 }
 
-export async function clearComparisonState(): Promise<void> {
+async function clearComparisonState(): Promise<void> {
   const database = await ensureDB();
   const transaction = database.transaction([STORE_NAME], "readwrite");
   const store = transaction.objectStore(STORE_NAME);
@@ -174,7 +174,7 @@ export async function clearComparisonState(): Promise<void> {
   });
 }
 
-export async function getCacheStats(): Promise<{ catalogSize?: number; hasComparisonState: boolean }> {
+async function getCacheStats(): Promise<{ catalogSize?: number; hasComparisonState: boolean }> {
   try {
     const catalog = await getCatalogFromIndexedDB();
     const comparison = await getComparisonState();
@@ -189,7 +189,7 @@ export async function getCacheStats(): Promise<{ catalogSize?: number; hasCompar
   }
 }
 
-export async function clearIndexedDB(): Promise<void> {
+async function clearIndexedDB(): Promise<void> {
   const database = await ensureDB();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_NAME], "readwrite");

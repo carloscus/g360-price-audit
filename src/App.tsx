@@ -45,17 +45,16 @@ function App() {
   const { toasts, addToast, removeToast } = useToasts();
 
   return (
-    // Jerarquía de Proveedores de Contexto
     <ErrorBoundary>
     <ToastContext.Provider value={{ addToast }}>
       <AuthProvider>
         <ThemeWrapper>
           <Layout>
             <Routes>
-              <Route path="/" element={<LoginPage />} />
+              <Route path="/" element={<ErrorBoundary><LoginPage /></ErrorBoundary>} />
               <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="/home" element={<ProtectedRoute><Navigate to="/comparador" replace /></ProtectedRoute>} />
-              <Route path="/comparador" element={<ProtectedRoute><ComparadorPage /></ProtectedRoute>} />
+              <Route path="/comparador" element={<ProtectedRoute><ErrorBoundary><ComparadorPage /></ErrorBoundary></ProtectedRoute>} />
                       <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <ToastContainer toasts={toasts} onClose={removeToast} />

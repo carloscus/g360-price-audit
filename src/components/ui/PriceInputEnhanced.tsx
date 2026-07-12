@@ -200,7 +200,7 @@ export const PriceInputEnhanced: React.FC<PriceInputEnhancedProps> = ({
   );
 };
 
-export interface ColoredHeaderProps {
+interface ColoredHeaderProps {
   children: React.ReactNode;
   type?: 'costo' | 'precio' | 'markup' | 'margen' | 'ganancia' | 'default';
   className?: string;

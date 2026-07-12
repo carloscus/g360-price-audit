@@ -1,5 +1,12 @@
 export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
 
+export const DEFAULT_MY_BRAND = 'Mi Marca';
+export const APP_LOCALE = 'es-PE';
+
+export function formatDateForFilename(date: Date = new Date()): string {
+  return date.toLocaleDateString(APP_LOCALE).replace(/\//g, '-');
+}
+
 export function debugLog(...args: unknown[]) {
   if (import.meta.env.DEV) {
     console.log('[DEBUG]', ...args);
@@ -18,30 +25,3 @@ export function debugError(...args: unknown[]) {
   }
 }
 
-export const MAX_FECHAS = 160;
-export const MAX_AMOUNT = 10000000;
-export const MAX_CLIENT_DESC_LENGTH = 100;
-export const MAX_PEDIDO_LENGTH = 50;
-
-export const COLOR_PALETTES = {
-    viniball: { // Paleta de Rojos
-        background: 'rgba(255, 99, 132, 0.2)',
-        border: 'rgba(255, 99, 132, 1)'
-    },
-    vinifan: { // Paleta de Naranja
-        background: 'rgba(249, 115, 22, 0.2)',
-        border: 'rgba(249, 115, 22, 1)'
-    },
-    otros: { // Paleta de Verdes
-        background: 'rgba(75, 192, 192, 0.2)',
-        border: 'rgba(75, 192, 192, 1)'
-    },
-};
-
-export const LABELS = {
-    error_invalid_amount: `Monto máximo permitido: S/${MAX_AMOUNT.toLocaleString()}`,
-    error_no_dates: 'Seleccione al menos una fecha',
-    error_ruc: 'El RUC debe tener 11 dígitos numéricos',
-    error_razon_social_empty: 'La razón social no puede estar vacía',
-    loading_ruc: 'Buscando información del RUC...'
-};

@@ -5,6 +5,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { useToast } from '../../contexts/ToastContext';
 import { generateBulkUploadTemplate } from '../../utils/excelJsGenerator';
 import { downloadBlob } from '../../utils/downloadBlob';
+import { DEFAULT_MY_BRAND } from '../../utils/config';
 
 export const BulkImportButton: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -14,7 +15,7 @@ export const BulkImportButton: React.FC = () => {
 
   const handleDownloadTemplate = async () => {
     const marcas = [
-      formState.marca1 || 'Mi Marca',
+      formState.marca1 || DEFAULT_MY_BRAND,
       formState.marca2,
       formState.marca3,
       formState.marca4,

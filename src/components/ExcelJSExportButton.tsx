@@ -10,7 +10,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { Tooltip } from './ui';
 import { generateExcelWithExcelJS, type ExcelProducto } from '../utils/excelJsGenerator';
 import { downloadBlob } from '../utils/downloadBlob';
-import { debugLog, debugError } from '../utils/config';
+import { debugLog, debugError, formatDateForFilename } from '../utils/config';
 
 interface ExcelJSExportButtonProps {
   productos: ExcelProducto[];
@@ -53,7 +53,7 @@ export const ExcelJSExportButton: React.FC<ExcelJSExportButtonProps> = ({
         responsable,
       });
 
-      const filename = `comparador_${cliente?.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'cliente'}_${new Date().toLocaleDateString('es-PE').replace(/\//g, '-')}.xlsx`;
+      const filename = `comparador_${cliente?.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'cliente'}_${formatDateForFilename()}.xlsx`;
       downloadBlob(blob, filename);
       
       debugLog('✅ Exportación con ExcelJS exitosa');

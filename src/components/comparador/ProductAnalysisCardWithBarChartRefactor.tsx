@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import type { ComparisonTableRow } from '../../interfaces';
 import { getBrandColorByPosition } from '../../utils/colorScheme';
 import { useCompetitiveAnalysis } from '../../hooks/useCompetitiveAnalysis';
-import { Target, ChevronDown, ChevronUp } from 'lucide-react';
+import { calculateMargin } from '../../utils/calculationUtils';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { Target, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import '../../styles/print-report.css';
 
 interface ProductAnalysisCardWithBarChartRefactorProps {
    item: ComparisonTableRow;
    competidores: string[];
+   costo?: number | null;
    onExpand?: (item: ComparisonTableRow) => void;
    highlightedBrand?: string | null;
    onBrandHover?: (brandName: string | null) => void;
@@ -16,11 +19,13 @@ interface ProductAnalysisCardWithBarChartRefactorProps {
 export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCardWithBarChartRefactorProps> = ({
    item,
    competidores,
+   costo,
    onExpand,
    highlightedBrand,
    onBrandHover,
 }) => {
-   const [isExpanded, setIsExpanded] = useState(true);
+    const isMobile = useIsMobile();
+    const [isExpanded, setIsExpanded] = useState(!isMobile);
    const {
      myPrice,
      allPrices,
@@ -29,7 +34,9 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
      formatPercentageWithIndicator,
    } = useCompetitiveAnalysis(item, competidores);
 
-   const avgGap = avgPrice > 0 && myPrice > 0 ? ((myPrice - avgPrice) / avgPrice) * 100 : 0;
+    const avgGap = avgPrice > 0 && myPrice > 0 ? ((myPrice - avgPrice) / avgPrice) * 100 : 0;
+    const marginPct = costo != null && myPrice > 0 ? calculateMargin(costo, myPrice) : null;
+    const cheapestGap = minPrice > 0 && myPrice > 0 ? myPrice - minPrice : null;
 
    const priceVolatility = validPrices.length > 0
      ? ((maxPrice - minPrice) / avgPrice) * 100
@@ -77,6 +84,12 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
            <div className="text-sm sm:text-base font-bold font-mono px-2.5 sm:px-3 py-1 rounded-lg flex-shrink-0" style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
              S/ {myPrice.toFixed(2)}
            </div>
+           {costo != null && costo > 0 && (
+             <div className="text-xs font-mono px-2 py-1 rounded-lg flex-shrink-0 flex items-center gap-1" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-secondary)' }}>
+               <DollarSign className="w-3 h-3" />
+               S/ {costo.toFixed(2)}
+             </div>
+           )}
           <button
             onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
             className="p-1.5 rounded-md hover:bg-[var(--surface-secondary)] transition-colors flex-shrink-0"
@@ -87,8 +100,7 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="flex flex-col lg:flex-row text-sm">
+      <div className={`flex flex-col lg:flex-row text-sm ${isExpanded ? '' : 'hidden'}`}>
           {/* Left - Gráfico de Comparación */}
           <div className="flex-1 px-3 py-2.5 sm:px-3.5 sm:py-3">
             <h4 className="text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wider flex items-center gap-1.5">
@@ -152,6 +164,29 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
                </InfoBlock>
              </div>
 
+            {/* Margen y Más Barato */}
+            <div className="grid grid-cols-2 gap-2">
+              {marginPct != null && (
+                <div className="rounded-md border px-2 py-1.5" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-tertiary)' }}>
+                  <div className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-0.5">Margen</div>
+                  <div className={`text-sm font-bold font-mono leading-none ${marginPct >= 20 ? 'text-[var(--color-on-surface-success)]' : marginPct >= 10 ? 'text-amber-600' : 'text-[var(--color-on-surface-error)]'}`}>
+                    {marginPct.toFixed(1)}%
+                  </div>
+                </div>
+              )}
+              {cheapestGap != null && (
+                <div className="rounded-md border px-2 py-1.5" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-tertiary)' }}>
+                  <div className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-0.5">Más barato</div>
+                  <div className={`text-sm font-bold font-mono leading-none ${cheapestGap <= 0 ? 'text-[var(--color-on-surface-success)]' : 'text-[var(--color-on-surface-error)]'}`}>
+                    S/ {minPrice.toFixed(2)}
+                    <span className="text-xs ml-1 opacity-70">
+                      {cheapestGap > 0 ? `+${cheapestGap.toFixed(2)}` : cheapestGap.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Middle - Brecha vs Promedio (Compacto) */}
               <div className="rounded-md border px-2.5 py-2" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-tertiary)' }}>
               <div className="flex items-center gap-1 mb-1">
@@ -168,10 +203,9 @@ export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCa
               <InfoBlock label="Volat." value={`${priceVolatility.toFixed(2)}%`} mono light compact />
               <InfoBlock label="Mejor" value={bestDiff ? formatPercentageWithIndicator(bestDiff.percentage) : '-'} variant="success" compact />
               <InfoBlock label="Peor" value={worstDiff ? formatPercentageWithIndicator(worstDiff.percentage) : '-'} variant="danger" compact />
-            </div>
           </div>
         </div>
-      )}
+      </div>
     </article>
   );
 };

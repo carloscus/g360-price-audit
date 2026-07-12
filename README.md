@@ -6,6 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript_5.9-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite_7-646CFF?style=flat&logo=vite)](https://vitejs.dev/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS_3.4-06B6D4?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+[![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=flat&logo=pwa)](https://web.dev/progressive-web-apps/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -44,7 +45,10 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 | **Comparador de Precios** | Compara precios entre tu marca y hasta 5 competidores con variaciones porcentuales automáticas |
 | **Simulador de Márgenes** | Panel lateral (slide-over) para simular propuestas comerciales con validación de "Ranking de Estante" |
 | **Reporte para Jefatura** | Hoja secundaria en Excel con Costo de Fábrica, Margen de Protección mínimo y alertas semáforo |
-| **Exportación XLSX Robusta** | Celdas editables con formato condicional que sobreviven a pegados masivos (Ctrl+V) |
+| **Exportación XLSX Robusta** | Celdas editables con formato condicional que sobreviven a pegados masivos (Ctrl+V). Sheet 2 "Tablero de Decisión" con 25 columnas agrupadas en 6 bloques, fórmulas vivas y STATUS multicondición. |
+| **Progressive Web App** | Service worker con precaché de assets, manifest con iconos maskable, instalable en dispositivos móviles y desktop |
+| **Responsive Mobile** | Vista adaptativa: cards en móvil con precios inline + tabla completa en desktop |
+| **Snapshot HTML** | Exportación a HTML A4 con gráficos y KPIs visibles, ideal para imprimir |
 | **Persistencia local** | Datos de costo y propuestas persisten en localStorage entre sesiones |
 | **Carga Masiva** | Importación mediante plantilla Excel para poblar el comparador con cientos de registros en segundos |
 | **Identidad EAN13** | Integración total con códigos de barras de 13 dígitos para sincronización con ERPs corporativos |
@@ -73,12 +77,13 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 | Tailwind CSS | 3.4 | Estilos utilitarios + CSS variables |
 | Zustand | 5.x | Gestión de estado con persistencia localStorage |
 | React Router DOM | 7.x | Navegación SPA |
-| Recharts | 3.x | Gráficos interactivos (barras, pastel) |
+| Recharts | 3.x | Gráficos interactivos (barras) |
 | React Hook Form | — | Manejo de formularios |
 | Zod | 4.x | Validación de esquemas tipados |
 | ExcelJS | — | Generación de XLSX con fórmulas nativas |
 | Lucide React | — | Iconos vectoriales |
 | html2canvas | — | Captura de pantallas para exportación PNG |
+| vite-plugin-pwa | 1.x | Service worker + manifest para PWA |
 
 ---
 
@@ -100,10 +105,10 @@ g360-price-audit/
 │   ├── api/
 │   │   └── schemas.ts
 │   ├── components/
-│   │   ├── comparador/         # BrandRankingChart, ComparisonBar, PriceInput,
-│   │   │                       # MiniPriceChart, PricePieChart, PrintReport, etc.
+│   │   ├── comparador/         # BrandRankingChart, MobilePriceRow, PriceInput,
+│   │   │                       # ProductAnalysisCardWithBarChartRefactor, ProductBarChartModal, etc.
 │   │   ├── margen/             # MarginSlideOver (simulador de propuestas)
-│   │   ├── ui/                 # Button, Modal, SearchInput, Toast, Tooltip, Select, etc.
+│   │   ├── ui/                 # Button, Modal, SearchInput, Toast, Tooltip, Select, PriceInputEnhanced
 │   │   ├── DataTable.tsx       # Tabla principal de precios
 │   │   ├── ExcelJSExportButton.tsx
 │   │   ├── Layout.tsx
@@ -116,10 +121,9 @@ g360-price-audit/
 │   │   ├── useComparadorColumns.tsx
 │   │   ├── useComparadorExport.tsx
 │   │   ├── useComparadorKPIs.ts
+│   │   ├── useIsMobile.ts
 │   │   ├── useMarginSlideOver.ts
 │   │   ├── useSearch.ts
-│   │   ├── useBackendSync.ts
-│   │   ├── useCatalogSync.ts
 │   │   ├── useCompetitiveAnalysis.ts
 │   │   ├── useFormValidation.ts
 │   │   └── useToasts.ts
@@ -279,12 +283,24 @@ Permite importar decenas de productos con sus precios en segundos usando una pla
 - Los valores numéricos aceptan tanto `0` como `0.00`
 - La columna SKU debe estar en formato texto si tiene ceros a la izquierda
 
-### 6. Tablero Estratégico (Hoja 2)
+### 6. Tablero Estratégico (Sheet 2 del XLSX)
 
-- **Costo Fábrica vs Mayorista**: Utilidad real empresa vs utilidad punto de venta
-- **Margen de Protección**: Casilla dinámica (C2) para umbral de rentabilidad
-- **Semáforo de Alerta**: Celdas se iluminan en rojo si la propuesta sacrifica margen
-- **Escudo de Color**: Formato condicional que soporta Ctrl+V masivo
+Comparación directa **Actual vs Propuesta P2** con 25 columnas agrupadas en 6 bloques visuales:
+
+| Bloque | Columnas |
+|--------|----------|
+| **Info** | SKU, PRODUCTO |
+| **Inputs Jefatura** | COSTO FÁBRICA (EDITABLE), % UTILIDAD MÍNIMA (EDITABLE) |
+| **Actual** | COSTO MAYORISTA ACT., P. TIENDA ACT., MARGEN MAYORISTA ACT., MARGEN CLIENTE ACT. |
+| **Propuesta P2** | P2 COSTO MAYORISTA, P2 PRECIO TIENDA, CANTIDAD MÍNIMA, MARGEN MAYORISTA P2, MARGEN CLIENTE P2 |
+| **Evaluación** | UTILIDAD UNIDAD ACT./P2, UTILIDAD TOTAL ACT./P2, VAR. UTILIDAD (S/ y %), PRECIO MÍN. FINANCIERO, DESVIACIÓN VS MÍN., PVP MÍNIMO MERCADO, INVERSIÓN COMERCIAL, VOL. EQUILIBRIO |
+| **Resultado** | STATUS (🛑 🔴 🟡 🟢 con lógica multicondición) |
+
+**STATUS** evalúa 4 condiciones en orden:
+1. 🛑 `P2 < Costo Fábrica` → Rechazado
+2. 🔴 `Margen P2 < Utilidad Mínima` → Rechazar
+3. 🟡 `Utilidad cae >60%` o `Vol. Equilibrio > Compromiso` → Revisar
+4. 🟢 Todo ok → Aprobar
 
 ---
 
@@ -304,7 +320,7 @@ Estructura recomendada para presentaciones del producto:
 
 ### Sección 3: Funcionalidades Core (5-7 diapositivas)
 - **3.1** Comparador de Precios — UI de tabla, búsqueda de productos, hasta 5 competidores
-- **3.2** Dashboard Visual — Gráficos Recharts (barras, pastel), KPIs, win rate
+- **3.2** Dashboard Visual — Gráficos Recharts (barras), KPIs, win rate
 - **3.3** Simulador de Márgenes — Slide-over con Propuesta 1 / Propuesta 2, ranking automático
 - **3.4** Carga Masiva — Plantilla Excel para importación rápida
 - **3.5** Exportación XLSX — Celdas editables, fórmulas vivas, escudo de color
@@ -324,7 +340,7 @@ Estructura recomendada para presentaciones del producto:
 - **6.1** Próximos pasos — Roadmap, integraciones planeadas
 - **6.2** Q&A — Preguntas y respuestas
 
-> 💡 **Tip para presentadores:** Use el modo oscuro de la aplicación para capturas de pantalla más profesionales. Los gráficos de Recharts (BrandRankingChart, PricePieChart) están diseñados con la paleta corporativa G360 para coherencia visual.
+> 💡 **Tip para presentadores:** Use el modo oscuro de la aplicación para capturas de pantalla más profesionales. Los gráficos de Recharts (BrandRankingChart, PriceBarChart) están diseñados con la paleta corporativa G360 para coherencia visual.
 
 ---
 
@@ -353,8 +369,7 @@ Fabricante → Mayorista → Tienda
 Crea un archivo `.env` en la raíz:
 
 ```env
-VITE_API_URL=http://localhost:5000
-VITE_APP_TITLE=CIPSA Análisis de Precios
+VITE_BACKEND_URL=http://localhost:5001
 ```
 
 ### Catálogo de Productos

@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/auth';
 import { MeshGradient, GrainyBackground } from '../components/ui/VisualEffects';
 import { LogIn, User, Mail, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { Spinner } from '../components/ui';
 
 const LoginPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -26,7 +27,11 @@ const LoginPage: React.FC = () => {
   const getAttempts = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return { attempts: 0, lastAttempt: 0 };
-    return JSON.parse(stored);
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return { attempts: 0, lastAttempt: 0 };
+    }
   };
 
   const setAttempts = (attempts: number) => {
@@ -58,36 +63,7 @@ const LoginPage: React.FC = () => {
     return true;
   };
 
-  const messageBorderColor = useMemo(() => {
-    if (!message) return '';
-    return message.includes('Error')
-      ? 'border-[var(--color-error-200)] bg-[var(--color-error-50)] dark:bg-[var(--color-error-900)]/20 dark:border-[var(--color-error-800)]'
-      : 'border-[var(--color-success-200)] bg-[var(--color-success-50)] dark:bg-[var(--color-success-900)]/20 dark:border-[var(--color-success-800)]';
-  }, [message]);
-
-  const messageTextColor = useMemo(() => {
-    if (!message) return '';
-    return message.includes('Error')
-      ? 'text-[var(--color-error-800)] dark:text-[var(--color-error-300)]'
-      : 'text-[var(--color-success-800)] dark:text-[var(--color-success-300)]';
-  }, [message]);
-
-  const messageIcon = useMemo(() => {
-    if (message.includes('Error')) {
-      return (
-        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-        </svg>
-      );
-    }
-    return (
-      <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-      </svg>
-    );
-  }, [message]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (timeUntilReset > 0) {
       const interval = setInterval(() => {
         setTimeUntilReset(prev => {
@@ -346,7 +322,7 @@ const LoginPage: React.FC = () => {
                       transition={{ duration: 0.4, ease: 'easeOut' }}
                       className="flex items-center justify-center gap-2"
                     >
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                      <Spinner size={20} className="text-[var(--color-btn-primary-text)]" />
                       <span>Iniciando...</span>
                     </motion.span>
                   ) : (

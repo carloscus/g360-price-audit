@@ -1,16 +1,8 @@
-// --------------------------------------------------------------------------- #
-//                                                                             #
-//              src/components/DataTable.tsx (Refactorizado)                   #
-//                                                                             #
-// --------------------------------------------------------------------------- #
-
-// --- 1. Importaciones necesarias ---
 import React, { useState, useMemo } from 'react';
 import { Inbox, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Tooltip } from './ui/Tooltip';
 import { useAppStore } from '../store/useAppStore';
 
-// --- 2. Definición de las Props del Componente ---
 export interface IColumn<T> {
   key?: string;
   header: React.ReactNode;

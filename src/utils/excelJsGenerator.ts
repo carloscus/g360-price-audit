@@ -1,5 +1,5 @@
 import * as ExcelJS from 'exceljs';
-import { debugLog } from './config';
+import { debugLog, APP_LOCALE } from './config';
 
 export interface ExcelProducto {
   codigo: string;
@@ -15,7 +15,7 @@ export interface ExcelProducto {
   prop2CantidadMinima?: number | null;
 }
 
-export interface ExcelData {
+interface ExcelData {
   productos: ExcelProducto[];
   marcas: string[];
   cliente: string;
@@ -94,6 +94,7 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'ccusi';
   workbook.created = new Date();
+  workbook.calcProperties.fullCalcOnLoad = true;
 
   const sheet1Name = 'AUDITORIA_DE_CAMPO';
   const worksheet = workbook.addWorksheet(sheet1Name);
@@ -117,7 +118,7 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
   worksheet.getCell('B2').value = data.documento || '';
   worksheet.getCell('A3').value = 'FECHA:';
   worksheet.getCell('A3').font = { bold: true };
-  worksheet.getCell('B3').value = data.fecha || new Date().toLocaleDateString('es-PE');
+  worksheet.getCell('B3').value = data.fecha || new Date().toLocaleDateString(APP_LOCALE);
   worksheet.getCell('A4').value = 'RESPONSABLE:';
   worksheet.getCell('A4').font = { bold: true };
   worksheet.getCell('B4').value = data.responsable || '';
@@ -417,14 +418,67 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
   managementSheet.getCell('A1').value = 'TABLERO DE DECISIÓN ESTRATÉGICA - JEFATURA';
   managementSheet.getCell('A1').font = { bold: true, size: 14, color: { argb: '006540' } };
 
+  // Tablero: Actual vs P2 (P1 es decisión del cliente, no afecta fábrica)
+  // 6 bloques: Info, Inputs Jefatura, Actual, Propuesta P2, Evaluación, Resultado
+  // Bloque 1: Información
+  const MG_COL_SKU = 1;
+  const MG_COL_PRODUCTO = 2;
+  // Bloque 2: Inputs Jefatura
+  const MG_COL_COSTO_FABRICA = 3;
+  const MG_COL_PCT_UTILIDAD_MIN = 4;
+  // Bloque 3: Escenario Actual
+  const MG_COL_COSTO_MAYORISTA_ACT = 5;
+  const MG_COL_PRECIO_TIENDA_ACT = 6;
+  const MG_COL_MARGEN_MAYORISTA_ACT = 7;
+  const MG_COL_MARGEN_CLIENTE_ACT = 8;
+  // Bloque 4: Propuesta P2
+  const MG_COL_P2_COSTO_MAYORISTA = 9;
+  const MG_COL_P2_PRECIO_TIENDA = 10;
+  const MG_COL_CANTIDAD_MINIMA = 11;
+  const MG_COL_MARGEN_MAYORISTA_P2 = 12;
+  const MG_COL_MARGEN_CLIENTE_P2 = 13;
+  // Bloque 5: Evaluación
+  const MG_COL_UTILIDAD_UNIDAD_ACTUAL = 14;
+  const MG_COL_UTILIDAD_UNIDAD_P2 = 15;
+  const MG_COL_UTILIDAD_ACTUAL = 16;
+  const MG_COL_UTILIDAD_P2 = 17;
+  const MG_COL_VAR_UTILIDAD = 18;
+  const MG_COL_VAR_UTILIDAD_PCT = 19;
+  const MG_COL_PRECIO_MIN_FINANCIERO = 20;
+  const MG_COL_DESVIACION_PRECIO_MIN = 21;
+  const MG_COL_PVP_MINIMO_MERCADO = 22;
+  const MG_COL_INVERSION_COMERCIAL = 23;
+  const MG_COL_VOL_EQUILIBRIO = 24;
+  // Bloque 6: Resultado
+  const MG_COL_STATUS = 25;
+  const MG_LAST_COL = MG_COL_STATUS;
+
   const mgHeaders = [
-    'SKU', 'PRODUCTO', 
-    'COSTO FÁBRICA (EDITABLE)', // Vacío para llenado del Jefe - Seguridad de información
-    '% UTILIDAD MÍNIMA (EDITABLE)', // Nuevo: umbral de rentabilidad para Jefatura
-    'COSTO MAYORISTA ACT.', 'P. TIENDA ACT.', 'MARGEN EMPRESA ACT.', 
-    'P1 PRECIO TIENDA', 'MARGEN EMPRESA P1',
-    'P2 COSTO MAYORISTA', 'P2 PRECIO TIENDA', 'CANTIDAD MÍNIMA', 'MARGEN EMPRESA P2',
-    'UTILIDAD TOTAL ACT.', 'UTILIDAD TOTAL P2', 'STATUS'
+    'SKU', 'PRODUCTO',
+    'COSTO FÁBRICA (EDITABLE)',
+    '% UTILIDAD MÍNIMA (EDITABLE)',
+    'COSTO MAYORISTA ACT.', 'P. TIENDA ACT.', 'MARGEN MAYORISTA ACT.', 'MARGEN CLIENTE ACT.',
+    'P2 COSTO MAYORISTA', 'P2 PRECIO TIENDA', 'CANTIDAD MÍNIMA', 'MARGEN MAYORISTA P2', 'MARGEN CLIENTE P2',
+    'UTILIDAD UNIDAD ACT.', 'UTILIDAD UNIDAD P2',
+    'UTILIDAD ACTUAL', 'UTILIDAD P2', 'VAR. UTILIDAD (S/)', 'VAR. UTILIDAD (%)',
+    'PRECIO MÍN. FINANCIERO', 'DESVIACIÓN VS MÍN.',
+    'PVP MÍNIMO MERCADO', 'INVERSIÓN COMERCIAL', 'VOL. EQUILIBRIO',
+    'STATUS'
+  ];
+
+  const mgBlockColors = [
+    // Info (0-1)
+    '334155', '334155',
+    // Inputs Jefatura (2-3)
+    'EA580C', 'EA580C',
+    // Actual (4-7)
+    '059669', '059669', '059669', '059669',
+    // P2 (8-12)
+    '7B1FA2', '7B1FA2', '7B1FA2', '7B1FA2', '7B1FA2',
+    // Evaluación (13-23)
+    '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1', '0369A1',
+    // STATUS (24)
+    '991B1B',
   ];
 
   const mgHeaderRow = managementSheet.getRow(3);
@@ -433,147 +487,178 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
     cell.value = h;
     cell.font = { bold: true, color: { argb: 'FFFFFF' }, size: 10 };
     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-    // Colores por secciones
-    if (i < 2) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '334155' } }; // Info
-    else if (i < 4) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EA580C' } }; // Inputs de Jefatura
-    else if (i < 7) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '059669' } }; // Actual
-    else if (i < 9) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1A73E8' } }; // P1
-    else if (i < 13) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '7B1FA2' } }; // P2
-    else cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '991B1B' } }; // Utilidades y STATUS
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: mgBlockColors[i] || '334155' } };
   });
 
   data.productos.forEach((prod, index) => {
-    const mgR = index + 4; // Fila en Hoja 2
-    const sourceR = index + tableStartRow + 1; // Fila en Hoja 1
+    const mgR = index + 4;
+    const sourceR = index + tableStartRow + 1;
     const row = managementSheet.getRow(mgR);
 
-    // Referencias de columnas por letra para fórmulas
-    const colC = colToLetter(3); // Costo Fábrica
-    const colD = colToLetter(4); // % Utilidad Mínima
-    const colE = colToLetter(5); // Costo Mayorista Act.
-    const colJ = colToLetter(10); // P2 Costo Mayorista
-    const colL = colToLetter(12); // Cantidad Mínima
-    const colM = colToLetter(13); // Margen Empresa P2
+    // Letras de columnas para fórmulas
+    const colC = colToLetter(MG_COL_COSTO_FABRICA);            // 3
+    const colD = colToLetter(MG_COL_PCT_UTILIDAD_MIN);          // 4
+    const colE = colToLetter(MG_COL_COSTO_MAYORISTA_ACT);       // 5
+    const colF = colToLetter(MG_COL_PRECIO_TIENDA_ACT);         // 6
+    const colI = colToLetter(MG_COL_P2_COSTO_MAYORISTA);        // 9
+    const colK = colToLetter(MG_COL_CANTIDAD_MINIMA);           // 11
+    const colL = colToLetter(MG_COL_MARGEN_MAYORISTA_P2);       // 12
+    const colN = colToLetter(MG_COL_UTILIDAD_UNIDAD_ACTUAL);    // 14
+    const colO = colToLetter(MG_COL_UTILIDAD_UNIDAD_P2);        // 15
+    const colP = colToLetter(MG_COL_UTILIDAD_ACTUAL);           // 16
+    const colQ = colToLetter(MG_COL_UTILIDAD_P2);               // 17
+    const colS = colToLetter(MG_COL_VAR_UTILIDAD_PCT);          // 19
+    const colT = colToLetter(MG_COL_PRECIO_MIN_FINANCIERO);     // 20
+    const colX = colToLetter(MG_COL_VOL_EQUILIBRIO);            // 24
 
-    // 1. SKU y Nombre (Links a Hoja 1)
-    row.getCell(1).value = { formula: `='${sheet1Name}'!${colToLetter(COL_CODIGO)}${sourceR}` };
-    row.getCell(2).value = { formula: `='${sheet1Name}'!${colToLetter(COL_NOMBRE)}${sourceR}` };
+    // ============================================================
+    // Bloque 1: Información básica (desde Hoja 1)
+    // ============================================================
+    row.getCell(MG_COL_SKU).value = { formula: `='${sheet1Name}'!${colToLetter(COL_CODIGO)}${sourceR}` };
+    row.getCell(MG_COL_PRODUCTO).value = { formula: `='${sheet1Name}'!${colToLetter(COL_NOMBRE)}${sourceR}` };
 
-    // 2. Costo Fábrica: VACÍO - Seguridad de información de fábrica
-    const factoryCostCell = row.getCell(3);
-    factoryCostCell.value = null; // Vacío para llenado manual por Jefatura
-    factoryCostCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; // Amarillo brillante
+    // ============================================================
+    // Bloque 2: Inputs de Jefatura (editables)
+    // ============================================================
+    const factoryCostCell = row.getCell(MG_COL_COSTO_FABRICA);
+    factoryCostCell.value = null;
+    factoryCostCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
     factoryCostCell.border = { top: {style:'medium'}, bottom: {style:'medium'}, left: {style:'medium'}, right: {style:'medium'} };
 
-    // 3. % Utilidad Mínima: editable para Jefatura
-    const minUtilCell = row.getCell(4);
-    minUtilCell.value = 0.1; // 10% por defecto
+    const minUtilCell = row.getCell(MG_COL_PCT_UTILIDAD_MIN);
+    minUtilCell.value = 0.1;
     minUtilCell.numFmt = '0%';
-    minUtilCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; // Amarillo brillante
+    minUtilCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
     minUtilCell.border = { top: {style:'medium'}, bottom: {style:'medium'}, left: {style:'medium'}, right: {style:'medium'} };
 
-    // 4. Enlaces Espejo directos a la Hoja 1
-    row.getCell(5).value = { formula: `='${sheet1Name}'!${colToLetter(COL_COSTO)}${sourceR}` }; // Costo Mayorista Act.
-    row.getCell(6).value = { formula: `='${sheet1Name}'!${colToLetter(COL_PRECIO_TIENDA)}${sourceR}` }; // P. Tienda Act.
-    row.getCell(7).value = { formula: `=IFERROR((${colE}${mgR}-${colC}${mgR})/${colE}${mgR},"")` }; // Margen Empresa Act.
+    // ============================================================
+    // Bloque 3: Escenario Actual
+    // ============================================================
+    row.getCell(MG_COL_COSTO_MAYORISTA_ACT).value = { formula: `='${sheet1Name}'!${colToLetter(COL_COSTO)}${sourceR}` };
+    row.getCell(MG_COL_PRECIO_TIENDA_ACT).value = { formula: `='${sheet1Name}'!${colToLetter(COL_PRECIO_TIENDA)}${sourceR}` };
+    row.getCell(MG_COL_MARGEN_MAYORISTA_ACT).value = { formula: `=IFERROR((${colE}${mgR}-${colC}${mgR})/${colE}${mgR},"")` };
+    row.getCell(MG_COL_MARGEN_CLIENTE_ACT).value = { formula: `=IFERROR((${colF}${mgR}-${colE}${mgR})/${colF}${mgR},"")` };
 
-    // 5. Propuesta 1 (Mismo costo mayorista, nuevo precio tienda)
-    row.getCell(8).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P1_PRECIO)}${sourceR}` }; // P1 Precio Tienda
-    row.getCell(9).value = { formula: `=IFERROR((${colE}${mgR}-${colC}${mgR})/${colE}${mgR},"")` }; // Margen Empresa P1
+    // ============================================================
+    // Bloque 4: Propuesta P2
+    // ============================================================
+    row.getCell(MG_COL_P2_COSTO_MAYORISTA).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_COSTO)}${sourceR}` };
+    row.getCell(MG_COL_P2_PRECIO_TIENDA).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_PRECIO)}${sourceR}` };
+    row.getCell(MG_COL_CANTIDAD_MINIMA).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_CANTIDAD_MINIMA)}${sourceR}` };
+    row.getCell(MG_COL_MARGEN_MAYORISTA_P2).value = { formula: `=IFERROR((${colI}${mgR}-${colC}${mgR})/${colI}${mgR},"")` };
+    const colJ = colToLetter(MG_COL_P2_PRECIO_TIENDA); // 10
+    row.getCell(MG_COL_MARGEN_CLIENTE_P2).value = { formula: `=IFERROR((${colJ}${mgR}-${colI}${mgR})/${colJ}${mgR},"")` };
 
-    // 6. Propuesta 2 (Nuevo costo mayorista, nuevo precio tienda)
-    row.getCell(10).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_COSTO)}${sourceR}` }; // P2 Costo Mayorista
-    row.getCell(11).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_PRECIO)}${sourceR}` }; // P2 Precio Tienda
-    row.getCell(12).value = { formula: `='${sheet1Name}'!${colToLetter(COL_P2_CANTIDAD_MINIMA)}${sourceR}` }; // Cantidad Mínima
-    row.getCell(13).value = { formula: `=IFERROR((${colJ}${mgR}-${colC}${mgR})/${colJ}${mgR},"")` }; // Margen Empresa P2
+    // ============================================================
+    // Bloque 5: Evaluación
+    // ============================================================
+    // Utilidad Unidad Actual = CostoMayoristaAct - CostoFabrica
+    row.getCell(MG_COL_UTILIDAD_UNIDAD_ACTUAL).value = { formula: `=IFERROR(${colE}${mgR}-${colC}${mgR},"")` };
+    // Utilidad Unidad P2 = P2CostoMayorista - CostoFabrica
+    row.getCell(MG_COL_UTILIDAD_UNIDAD_P2).value = { formula: `=IFERROR(${colI}${mgR}-${colC}${mgR},"")` };
+    // Utilidad Actual (total) = CantMin × (CostoMayoristaAct - CostoFabrica)
+    row.getCell(MG_COL_UTILIDAD_ACTUAL).value = { formula: `=IFERROR(${colK}${mgR}*(${colE}${mgR}-${colC}${mgR}),"")` };
+    // Utilidad P2 (total) = CantMin × (P2CostoMayorista - CostoFabrica)
+    row.getCell(MG_COL_UTILIDAD_P2).value = { formula: `=IFERROR(${colK}${mgR}*(${colI}${mgR}-${colC}${mgR}),"")` };
+    // Var Utilidad (S/) = UtilidadP2 - UtilidadActual
+    row.getCell(MG_COL_VAR_UTILIDAD).value = { formula: `=IFERROR(${colQ}${mgR}-${colP}${mgR},"")` };
+    // Var Utilidad (%) = (UtilidadP2 - UtilidadActual) / UtilidadActual
+    row.getCell(MG_COL_VAR_UTILIDAD_PCT).value = { formula: `=IFERROR((${colQ}${mgR}-${colP}${mgR})/${colP}${mgR},"")` };
+    // Precio Mín Financiero = CostoFabrica × (1 + %UtilidadMin)
+    row.getCell(MG_COL_PRECIO_MIN_FINANCIERO).value = { formula: `=IFERROR(${colC}${mgR}*(1+${colD}${mgR}),"")` };
+    // Desviación vs Precio Mín = (P2CostoMayorista - PrecioMinFin) / PrecioMinFin
+    row.getCell(MG_COL_DESVIACION_PRECIO_MIN).value = { formula: `=IFERROR((${colI}${mgR}-${colT}${mgR})/${colT}${mgR},"")` };
+    // PVP Mínimo Mercado = MIN(precios competencia de Hoja 1)
+    if (competidorPriceCols.length > 0) {
+      const compRefs = competidorPriceCols.map(c => `'${sheet1Name}'!${colToLetter(c)}${sourceR}`);
+      row.getCell(MG_COL_PVP_MINIMO_MERCADO).value = { formula: `=IFERROR(MIN(${compRefs.join(',')}),"")` };
+    }
+    // Inversión Comercial = CantMin × (CostoMayoristaAct - P2CostoMayorista)
+    row.getCell(MG_COL_INVERSION_COMERCIAL).value = { formula: `=IFERROR(${colK}${mgR}*(${colE}${mgR}-${colI}${mgR}),"")` };
+    // Vol Equilibrio = ROUND(CantMin × (MayoristaAct - Fabrica) / (P2Mayorista - Fabrica), 0)
+    row.getCell(MG_COL_VOL_EQUILIBRIO).value = { formula: `=IFERROR(ROUND(${colK}${mgR}*(${colE}${mgR}-${colC}${mgR})/(${colI}${mgR}-${colC}${mgR}),0),"—")` };
 
-    // 7. Utilidades Totales
-    row.getCell(14).value = { formula: `=IFERROR(${colL}${mgR}*(${colE}${mgR}-${colC}${mgR}),"")` }; // Utilidad Total Actual
-    row.getCell(15).value = { formula: `=IFERROR(${colL}${mgR}*(${colJ}${mgR}-${colC}${mgR}),"")` }; // Utilidad Total P2
-
-    // 8. Árbitro Financiero - STATUS con IF en MAYÚSCULAS + % Utilidad Mínima
-    const statusCell = row.getCell(16);
-    statusCell.value = { 
-      formula: `=IF(${colC}${mgR}="","",IF(${colJ}${mgR}<${colC}${mgR},"🛑 RECHAZADO: BAJO COSTO FÁBRICA",IF(${colM}${mgR}<${colD}${mgR},"⚠️ BAJO UMBRAL DE UTILIDAD MÍNIMA","🟢 PROPUESTA VIABLE")))`
+    // ============================================================
+    // Bloque 6: Status — lógica multicondición
+    // ============================================================
+    // 🛑 = P2 bajo costo fábrica
+    // 🔴 = margen P2 bajo mínimo
+    // 🟡 = utilidad cae >60% o vol equilibrio > compromiso
+    // 🟢 = todo ok
+    const statusCell = row.getCell(MG_COL_STATUS);
+    statusCell.value = {
+      formula: `=IF(${colC}${mgR}="","",IF(${colI}${mgR}<${colC}${mgR},"🛑 RECHAZADO: P2 BAJO COSTO FÁBRICA",IF(${colL}${mgR}<${colD}${mgR},"🔴 RECHAZAR: BAJO MARGEN MÍNIMO",IF(${colS}${mgR}<-0.6,"🟡 REVISAR: UTILIDAD CAE >60%",IF(${colX}${mgR}>${colK}${mgR},"🟡 REVISAR: VOL.EQUILIBRIO > COMPROMISO","🟢 APROBAR")))))`
     };
     statusCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     statusCell.font = { bold: true };
 
-    // 9. Formato Condicional para alertas visuales en STATUS
+    // Formato condicional: 4 reglas para los 4 status
+    const statusRef = `${colToLetter(MG_COL_STATUS)}${mgR}`;
     managementSheet.addConditionalFormatting({
-      ref: `P${mgR}`,
+      ref: statusRef,
       rules: [
-        {
-          type: 'containsText',
-          operator: 'containsText',
-          text: '🛑',
-          priority: 1,
-          style: {
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } },
-            font: { color: { argb: 'FF991B1B' }, bold: true }
-          }
-        },
-        {
-          type: 'containsText',
-          operator: 'containsText',
-          text: '⚠️',
-          priority: 2,
-          style: {
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } },
-            font: { color: { argb: 'FFB45309' }, bold: true }
-          }
-        },
-        {
-          type: 'containsText',
-          operator: 'containsText',
-          text: '🟢',
-          priority: 3,
-          style: {
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } },
-            font: { color: { argb: 'FF166534' }, bold: true }
-          }
-        }
+        { type: 'containsText', operator: 'containsText', text: '🛑', priority: 1, style: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } }, font: { color: { argb: 'FF991B1B' }, bold: true } } },
+        { type: 'containsText', operator: 'containsText', text: '🔴', priority: 2, style: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } }, font: { color: { argb: 'FF991B1B' }, bold: true } } },
+        { type: 'containsText', operator: 'containsText', text: '🟡', priority: 3, style: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } }, font: { color: { argb: 'FFB45309' }, bold: true } } },
+        { type: 'containsText', operator: 'containsText', text: '🟢', priority: 4, style: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }, font: { color: { argb: 'FF166534' }, bold: true } } },
       ]
     });
 
     // Formatos numéricos
-    row.getCell(3).numFmt = currencyFormat;   // Costo Fábrica
-    row.getCell(4).numFmt = '0%';             // % Utilidad Mínima
-    row.getCell(5).numFmt = currencyFormat;   // Costo Mayorista Act.
-    row.getCell(6).numFmt = currencyFormat;   // P. Tienda Act.
-    row.getCell(7).numFmt = percentageFormat; // Margen Empresa Act.
-    row.getCell(8).numFmt = currencyFormat;   // P1 Precio Tienda
-    row.getCell(9).numFmt = percentageFormat; // Margen Empresa P1
-    row.getCell(10).numFmt = currencyFormat;  // P2 Costo Mayorista
-    row.getCell(11).numFmt = currencyFormat;  // P2 Precio Tienda
-    row.getCell(12).numFmt = '#,##0';         // Cantidad Mínima
-    row.getCell(13).numFmt = percentageFormat;// Margen Empresa P2
-    row.getCell(14).numFmt = currencyFormat;  // Utilidad Total Act.
-    row.getCell(15).numFmt = currencyFormat;  // Utilidad Total P2
+    row.getCell(MG_COL_COSTO_FABRICA).numFmt = currencyFormat;
+    row.getCell(MG_COL_PCT_UTILIDAD_MIN).numFmt = '0%';
+    row.getCell(MG_COL_COSTO_MAYORISTA_ACT).numFmt = currencyFormat;
+    row.getCell(MG_COL_PRECIO_TIENDA_ACT).numFmt = currencyFormat;
+    row.getCell(MG_COL_MARGEN_MAYORISTA_ACT).numFmt = percentageFormat;
+    row.getCell(MG_COL_MARGEN_CLIENTE_ACT).numFmt = percentageFormat;
+    row.getCell(MG_COL_P2_COSTO_MAYORISTA).numFmt = currencyFormat;
+    row.getCell(MG_COL_P2_PRECIO_TIENDA).numFmt = currencyFormat;
+    row.getCell(MG_COL_CANTIDAD_MINIMA).numFmt = '#,##0';
+    row.getCell(MG_COL_MARGEN_MAYORISTA_P2).numFmt = percentageFormat;
+    row.getCell(MG_COL_MARGEN_CLIENTE_P2).numFmt = percentageFormat;
+    row.getCell(MG_COL_UTILIDAD_UNIDAD_ACTUAL).numFmt = currencyFormat;
+    row.getCell(MG_COL_UTILIDAD_UNIDAD_P2).numFmt = currencyFormat;
+    row.getCell(MG_COL_UTILIDAD_ACTUAL).numFmt = currencyFormat;
+    row.getCell(MG_COL_UTILIDAD_P2).numFmt = currencyFormat;
+    row.getCell(MG_COL_VAR_UTILIDAD).numFmt = currencyFormat;
+    row.getCell(MG_COL_VAR_UTILIDAD_PCT).numFmt = percentageFormat;
+    row.getCell(MG_COL_PRECIO_MIN_FINANCIERO).numFmt = currencyFormat;
+    row.getCell(MG_COL_DESVIACION_PRECIO_MIN).numFmt = percentageFormat;
+    row.getCell(MG_COL_PVP_MINIMO_MERCADO).numFmt = currencyFormat;
+    row.getCell(MG_COL_INVERSION_COMERCIAL).numFmt = currencyFormat;
+    row.getCell(MG_COL_VOL_EQUILIBRIO).numFmt = '#,##0';
   });
 
   // Ajustar anchos de columnas en Hoja 2
-  managementSheet.getColumn(1).width = 12;  // SKU
-  managementSheet.getColumn(2).width = 35;  // Producto
-  managementSheet.getColumn(3).width = 22;  // Costo Fábrica
-  managementSheet.getColumn(4).width = 18;  // % Utilidad Mínima
-  for(let i=5; i<=12; i++) managementSheet.getColumn(i).width = 16;
-  managementSheet.getColumn(13).width = 16; // Margen P2
-  managementSheet.getColumn(14).width = 18; // Utilidad Total Act.
-  managementSheet.getColumn(15).width = 18; // Utilidad Total P2
-  managementSheet.getColumn(16).width = 36; // STATUS
+  managementSheet.getColumn(MG_COL_SKU).width = 12;
+  managementSheet.getColumn(MG_COL_PRODUCTO).width = 35;
+  managementSheet.getColumn(MG_COL_COSTO_FABRICA).width = 22;
+  managementSheet.getColumn(MG_COL_PCT_UTILIDAD_MIN).width = 18;
+  for (let i = MG_COL_COSTO_MAYORISTA_ACT; i <= MG_COL_MARGEN_CLIENTE_P2; i++) managementSheet.getColumn(i).width = 16;
+  for (let i = MG_COL_UTILIDAD_UNIDAD_ACTUAL; i <= MG_COL_INVERSION_COMERCIAL; i++) managementSheet.getColumn(i).width = 18;
+  managementSheet.getColumn(MG_COL_VOL_EQUILIBRIO).width = 16;
+  managementSheet.getColumn(MG_COL_STATUS).width = 40;
 
   // Nota explicativa para Jefatura
   const noteStart = data.productos.length + 6;
+  const noteCol = colToLetter(MG_LAST_COL);
   managementSheet.getCell(`A${noteStart}`).value = 'INSTRUCCIONES PARA JEFATURA:';
   managementSheet.getCell(`A${noteStart}`).font = { bold: true };
-  managementSheet.mergeCells(`A${noteStart + 1}:F${noteStart + 5}`);
+  managementSheet.mergeCells(`A${noteStart + 1}:${noteCol}${noteStart + 14}`);
   managementSheet.getCell(`A${noteStart + 1}`).value = 
-    '1. Ingrese el Costo de Fábrica real en la columna C (Celdas Amarillas).\n' +
-    '2. Defina el % de Utilidad Mínima objetivo en la columna D.\n' +
-    '3. El Margen Empresa indica la rentabilidad de la fábrica al vender al mayorista.\n' +
-    '4. La Utilidad Total proyecta la ganancia basada en la Cantidad Mínima comprometida.\n' +
-    '5. El STATUS evalúa: rechazo por bajo costo, alerta por umbral mínimo, o viable.';
+    '1. Ingrese el Costo de Fábrica real en la columna C (celdas amarillas).\n' +
+    '2. Defina el % de Utilidad Mínima objetivo en la columna D (ej: 10%).\n' +
+    '3. MARGEN MAYORISTA = (Mayorista - Fábrica) / Mayorista.\n' +
+    '4. MARGEN CLIENTE = (PVP - Mayorista) / PVP — mide el incentivo del distribuidor.\n' +
+    '5. UTILIDAD UNIDAD = ganancia por unidad al mayorista.\n' +
+    '6. UTILIDAD TOTAL = Cant.Mín × Utilidad Unidad.\n' +
+    '7. VAR. UTILIDAD (%) = (Utilidad P2 - Utilidad Actual) / Utilidad Actual.\n' +
+    '8. PRECIO MÍN. FINANCIERO = Fábrica × (1 + %Utilidad Mín) — piso absoluto.\n' +
+    '9. DESVIACIÓN VS MÍN. = (P2 Mayorista - Mín Fin) / Mín Fin — negativo = bajo el umbral.\n' +
+    '10. PVP MÍNIMO MERCADO = menor precio de competencia.\n' +
+    '11. INVERSIÓN COMERCIAL = Cant.Mín × (Mayorista Act - P2 Mayorista) — utilidad cedida.\n' +
+    '12. VOL. EQUILIBRIO = unidades necesarias a P2 para igualar la utilidad actual.\n' +
+    '13. STATUS evalúa 4 condiciones en orden: 🛑 costo, 🔴 margen, 🟡 caída utilidad / volumen, 🟢 viable.';
   managementSheet.getCell(`A${noteStart + 1}`).alignment = { wrapText: true, vertical: 'top' };
 
 

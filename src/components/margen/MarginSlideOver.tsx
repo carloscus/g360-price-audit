@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { X, DollarSign, Percent, TrendingUp, Target, Trophy, Plus, Package, ArrowDownUp, Medal, BarChart3, RefreshCw } from 'lucide-react';
+import { X, DollarSign, Percent, TrendingUp, Target, Trophy, Plus, Package, ArrowDownUp, Medal, RefreshCw } from 'lucide-react';
 import { PriceInputEnhanced, ProfitDisplay } from '../ui/PriceInputEnhanced';
 
 interface CompetidorPrecio {
@@ -220,76 +220,6 @@ export const MarginSlideOver: React.FC<MarginSlideOverProps> = ({
                 <span>Más barato: {cheapestCompetitor.brand} a S/ {cheapestCompetitor.price.toFixed(2)}</span>
               </div>
             )}
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              Datos Base
-            </h3>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-			<label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[var(--color-on-surface-success)]">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>Costo (Venta Mayorista)</span>
-                </label>
-                <PriceInputEnhanced
-                  value={draft.costo}
-                  onChange={(valor) => onUpdateCampo('costo', valor)}
-                  type="costo"
-                  showCurrency
-                  size="md"
-                  className="w-full input-whatif-editable"
-                />
-              </div>
-              <div className="space-y-1.5">
-			<label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[var(--color-on-surface-warning)]">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>Precio Tienda (Mi Marca)</span>
-                </label>
-                <PriceInputEnhanced
-                  value={draft.precioTienda}
-                  onChange={(valor) => onUpdateCampo('precioTienda', valor)}
-                  type="precio"
-                  showCurrency
-                  size="md"
-                  className="w-full input-whatif-editable"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-[var(--color-info-300)] overflow-hidden">
-            <div className="bg-[var(--color-info-500)] text-[var(--color-text-inverse)] px-4 py-2.5 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              <h3 className="text-xs font-bold uppercase tracking-wider">Situación Actual</h3>
-            </div>
-            <div className="p-4 space-y-2 bg-[var(--color-input-tint-info-bg)]">
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)]">Margen</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <Percent className="w-3.5 h-3.5 text-[var(--color-primary-500)]" />
-                    <span className="text-lg font-bold font-mono text-[var(--color-on-surface-primary)]">
-                      {draft.margenActual !== null && isFinite(draft.margenActual) ? `${draft.margenActual.toFixed(1)}%` : '—'}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)]">Ganancia</span>
-                  <div className="mt-0.5">
-                    {draft.gananciaActual !== null
-                      ? <ProfitDisplay value={draft.gananciaActual} />
-                      : <span className="text-lg font-bold font-mono text-[var(--text-tertiary)]">—</span>}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)]">Ranking</span>
-                  <div className="mt-0.5">
-                    <RankingBadge ranking={draft.rankingActual} total={totalCompetidores} />
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="rounded-lg border border-[var(--color-primary-300)] overflow-hidden">

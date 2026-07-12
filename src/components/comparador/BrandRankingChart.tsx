@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Trophy, TrendingUp, TrendingDown, Target, BarChart3, Award } from 'lucide-react';
+import { Trophy, Target, BarChart3, Award } from 'lucide-react';
 import { getBrandColorByPosition } from '../../utils/colorScheme';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 

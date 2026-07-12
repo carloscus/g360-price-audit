@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -31,63 +32,30 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       }
 
       return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '2rem',
-          textAlign: 'center',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          background: 'var(--bg-primary, #0f172a)',
-          color: 'var(--text-primary, #f1f5f9)',
-        }}>
-          <div style={{
-            background: 'var(--surface-elevated, #1e293b)',
-            border: '1px solid var(--border-primary, rgba(148,163,184,0.3))',
-            borderRadius: '16px',
-            padding: '2.5rem',
-            maxWidth: '480px',
-            width: '100%',
-          }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary, #f1f5f9)' }}>
+        <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
+          <div className="bg-[var(--surface-elevated)] border border-[var(--border-primary)] rounded-2xl p-10 max-w-md w-full">
+            <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-[var(--color-danger)]" aria-hidden="true" />
+            <h2 className="text-lg font-bold mb-3 text-[var(--text-primary)]">
               Error inesperado
             </h2>
-            <p style={{ color: 'var(--text-secondary, #cbd5e1)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+            <p className="text-sm text-[var(--text-secondary)] mb-5">
               Ocurrió un error en la aplicación. Por favor, intente recargar la página.
             </p>
-            <details style={{ marginBottom: '1.5rem', textAlign: 'left', fontSize: '0.75rem' }}>
-              <summary style={{ cursor: 'pointer', color: 'var(--text-secondary, #cbd5e1)' }}>
+            <details className="mb-5 text-left text-xs">
+              <summary className="cursor-pointer text-[var(--text-secondary)] flex items-center gap-1">
+                <ChevronDown size={14} />
                 Detalles del error
               </summary>
-              <pre style={{
-                marginTop: '0.5rem',
-                padding: '0.75rem',
-                background: 'var(--bg-tertiary, #334155)',
-                borderRadius: '8px',
-                overflow: 'auto',
-                color: 'var(--color-danger, #f87171)',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-              }}>
+              <pre className="mt-2 p-3 bg-[var(--bg-tertiary)] rounded-lg overflow-auto text-[var(--color-danger)] whitespace-pre-wrap break-words">
                 {this.state.error?.message}
                 {this.state.error?.stack}
               </pre>
             </details>
             <button
               onClick={this.handleReset}
-              style={{
-                background: 'var(--color-primary, #00a86b)',
-                color: 'var(--color-btn-primary-text, #ffffff)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '0.625rem 1.5rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: '0.875rem',
-              }}
+              className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-[var(--color-btn-primary-text)] border-none rounded-lg px-5 py-2.5 font-semibold cursor-pointer text-sm hover:opacity-90 transition-opacity"
             >
+              <RefreshCw size={16} />
               Reintentar
             </button>
           </div>

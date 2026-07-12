@@ -102,7 +102,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               <span className="text-[var(--text-primary)] font-semibold">{initialValue.toFixed(2)}</span>
             </span>
           ) : (
-            <span className="text-[var(--text-secondary)] text-xs italic truncate">Precio en {competidor}</span>
+            <span className="text-[var(--text-secondary)] text-xs italic truncate">{competidor === 'costo' ? 'Costo Mayorista' : `Precio en ${competidor}`}</span>
           )}
         </div>
       ) : (
@@ -110,7 +110,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
           type="text"
           aria-label={`Precio de ${item.nombre} en ${competidor}`}
           aria-describedby={`help-${item.codigo}-${competidor}`}
-          placeholder={`Precio en ${competidor}`}
+          placeholder={competidor === 'costo' ? 'Costo Mayorista' : `Precio en ${competidor}`}
           value={displayValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}

@@ -11,11 +11,6 @@
  * @date 2026-03-03
  */
 
-/**
- * Utilidades centralizadas para cálculos de precios y porcentajes
- * Elimina duplicación de lógica matemática en toda la aplicación
- */
-
 export interface PriceData {
   label: string;
   value: number | null;

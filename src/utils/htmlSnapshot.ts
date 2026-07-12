@@ -4,7 +4,7 @@
  * sin necesidad de servidor ni conexión a internet.
  */
 
-import { debugLog, debugWarn } from './config';
+import { debugLog, debugWarn, formatDateForFilename, APP_LOCALE } from './config';
 
 interface HTMLSnapshotOptions {
   /** Título del documento */
@@ -13,10 +13,8 @@ interface HTMLSnapshotOptions {
   cliente?: string;
   /** Fecha del reporte */
   fecha?: string;
-  /** Incluir estilos de impresión */
-  includePrintStyles?: boolean;
-  /** Incluir scripts de interactividad básica */
-  includeInteractivity?: boolean;
+  /** Responsable / autor del reporte */
+  responsable?: string;
 }
 
 /**
@@ -181,25 +179,26 @@ function createHTMLDocument(
   content: string,
   options: HTMLSnapshotOptions
 ): string {
-  const { title, includePrintStyles = true, includeInteractivity = true } = options;
-  
-  // Detectar tema actual
+  const { title } = options;
+
   const isDark = document.documentElement.classList.contains('dark');
   const bodyClass = isDark ? 'dark' : '';
-  
+
+  const responsableMeta = options.responsable ? `\n  <meta name="author" content="${options.responsable}">` : '';
+
   return `<!DOCTYPE html>
 <html lang="es" class="${bodyClass}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Reporte generado desde Comparador de Precios">
+  <meta name="generator" content="G360 Ecosystem - Comparador de Precios">${responsableMeta}
   <title>${title}</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E">
   
   <style>
-    /* Reset básico */
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -212,32 +211,53 @@ function createHTMLDocument(
       -webkit-font-smoothing: antialiased;
     }
     
-    /* Variables CSS */
     ${extractCSSVariables()}
     
-    /* Estilos del documento original */
     ${extractAllStyles()}
     
-    ${includePrintStyles ? getPrintStyles() : ''}
+    @media print {
+      body {
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      .no-print {
+        display: none !important;
+      }
+      
+      .page-break {
+        page-break-before: always;
+      }
+      
+      .glass-card {
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      
+      @page {
+        margin: 1.5cm;
+        size: A4 portrait;
+      }
+    }
     
-    /* Estilos adicionales para el snapshot */
     .snapshot-header {
-      position: sticky;
-      top: 0;
       background: linear-gradient(135deg, #006540 0%, #00a86b 100%);
       color: white;
       padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 1000;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .dark .snapshot-header {
+      background: linear-gradient(135deg, #00432a 0%, #006540 100%);
     }
     
     .snapshot-header h1 {
       margin: 0;
       font-size: 1.25rem;
-      font-weight: 600;
     }
     
     .snapshot-actions {
@@ -262,7 +282,7 @@ function createHTMLDocument(
     
     .snapshot-content {
       padding: 1rem;
-      max-width: 1400px;
+      max-width: 210mm;
       margin: 0 auto;
     }
     
@@ -275,48 +295,36 @@ function createHTMLDocument(
       margin-top: 2rem;
     }
     
-    /* Dark mode para snapshot */
-    .dark .snapshot-header {
-      background: linear-gradient(135deg, #00432a 0%, #006540 100%);
+    .dark .snapshot-footer {
+      border-top-color: #475569;
+      color: #cbd5e1;
     }
-    
-     .dark .snapshot-footer {
-       border-top-color: #475569;
-       color: #cbd5e1;
-     }
   </style>
 </head>
 <body>
-  <!-- Header del snapshot -->
   <header class="snapshot-header no-print">
-    <h1 class="text-2xl font-extrabold">📊 ${title}</h1>
+    <h1>${title}</h1>
     <div class="snapshot-actions">
-      <button class="snapshot-btn" onclick="toggleTheme()" title="Cambiar tema">
-        🌓 Tema
-      </button>
-      <button class="snapshot-btn" onclick="printDocument()" title="Imprimir documento">
-        🖨️ Imprimir
-      </button>
+      <button class="snapshot-btn" onclick="toggleTheme()" title="Cambiar tema">🌓 Tema</button>
+      <button class="snapshot-btn" onclick="printDocument()" title="Imprimir">🖨️ Imprimir</button>
     </div>
   </header>
   
-  <!-- Contenido principal -->
   <main class="snapshot-content">
     ${content}
   </main>
   
-  <!-- Footer del snapshot -->
   <footer class="snapshot-footer">
-    <p>Generado el ${new Date().toLocaleDateString('es-PE', { 
+    <p>Generado el ${new Date().toLocaleDateString(APP_LOCALE, { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    })} | Comparador de Precios</p>
+    })}${options.responsable ? ` por ${options.responsable}` : ''} | Comparador de Precios</p>
   </footer>
   
-  ${includeInteractivity ? getInteractivityScripts() : ''}
+  ${getInteractivityScripts()}
 </body>
 </html>`;
 }
@@ -357,6 +365,21 @@ export async function generateHTMLSnapshot(
   const elementsToRemove = clone.querySelectorAll('.no-export, .sr-only, button, input, select, textarea, [data-no-export]');
   elementsToRemove.forEach(el => el.remove());
   
+  // Forzar visibilidad de todos los elementos ocultos para exportación
+  clone.querySelectorAll('.hidden').forEach(el => {
+    if (el instanceof HTMLElement) {
+      el.classList.remove('hidden');
+    }
+  });
+  
+  // Remover animaciones que puedan ocultar contenido
+  clone.querySelectorAll('[class*="animate-"]').forEach(el => {
+    if (el instanceof HTMLElement) {
+      el.style.opacity = '1';
+      el.style.animation = 'none';
+    }
+  });
+  
   // Convertir canvas a imágenes
   const canvases = clone.querySelectorAll('canvas');
   for (const canvas of canvases) {
@@ -376,7 +399,7 @@ debugWarn('No se pudo convertir un canvas a imagen:', e);
 
 	// Generar nombre del archivo
 	const clientName = (cliente || 'reporte').toLowerCase().replace(/[^a-z0-9]/g, '_');
-	const dateStr = fecha || new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
+	const dateStr = fecha || formatDateForFilename();
 	const filename = `comparador_${clientName}_${dateStr}.html`;
 
 	// Descargar
@@ -420,7 +443,7 @@ export async function generateMultiSectionHTMLSnapshot(
   
   // Generar nombre del archivo
   const clientName = (cliente || 'reporte').toLowerCase().replace(/[^a-z0-9]/g, '_');
-  const dateStr = fecha || new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
+  const dateStr = fecha || formatDateForFilename();
   const filename = `comparador_${clientName}_${dateStr}.html`;
   
   // Descargar

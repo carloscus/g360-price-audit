@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from 'react';
 import html2canvas from 'html2canvas';
-import { PreciosExport } from '../api/schemas';
+import type { PreciosExport } from '../api/schemas';
 import { exportApi } from '../utils/api';
 import { generateHTMLSnapshot } from '../utils/htmlSnapshot';
-import { debugLog, debugError } from '../utils/config';
+import { debugLog, debugError, formatDateForFilename } from '../utils/config';
 import type { IForm, ComparisonTableRow } from '../interfaces';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/auth';
@@ -81,7 +81,7 @@ export const useComparadorExport = (
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       const clientName = (formState.precios.cliente || 'comparacion').toLowerCase().replace(/[^a-z0-9]/g, '_');
-      const date = new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
+      const date = formatDateForFilename();
       link.download = `tabla_comparacion_${clientName}_${date}.png`;
       link.href = image;
       link.click();
@@ -110,8 +110,7 @@ export const useComparadorExport = (
         title: `Comparador de Precios - ${formState.precios.cliente || 'Cliente'}`,
         cliente: formState.precios.cliente,
         fecha: formState.precios.fecha,
-        includePrintStyles: true,
-        includeInteractivity: true,
+        responsable: userName || undefined,
       });
 
       addToast('El archivo HTML se ha generado correctamente.', 'success');
@@ -163,7 +162,7 @@ export const useComparadorExport = (
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         const clientName = (formData.cliente || 'dashboard').toLowerCase().replace(/[^a-z0-9]/g, '_');
-        const date = new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
+        const date = formatDateForFilename();
 
         link.download = `dashboard_${clientName}_${date}.png`;
         link.href = image;
@@ -211,7 +210,7 @@ export const useComparadorExport = (
 
       const finalFilename = filename && (filename.endsWith('.xlsx') || filename.endsWith('.pdf'))
         ? filename
-        : `comparador_${(formData.cliente || 'cliente').toLowerCase().replace(/[^a-z0-9]/g, '_')}_${new Date().toLocaleDateString('es-PE').replace(/\//g, '-')}.${format}`;
+        : `comparador_${(formData.cliente || 'cliente').toLowerCase().replace(/[^a-z0-9]/g, '_')}_${formatDateForFilename()}.${format}`;
 
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');

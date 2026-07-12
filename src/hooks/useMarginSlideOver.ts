@@ -2,7 +2,8 @@ import { useState, useCallback, useMemo } from 'react';
 import { useMarginStore, type MarginProduct } from '../store/useMarginStore';
 import type { ComparisonTableRow } from '../interfaces';
 import { useToast } from '../contexts/ToastContext';
-import { calculateDerivedMarginData } from '../utils/calculationUtils'; // Import centralized function
+import { calculateDerivedMarginData } from '../utils/calculationUtils';
+import { DEFAULT_MY_BRAND } from '../utils/config';
 
 interface SlideOverDraft {
   codigo: string;
@@ -57,7 +58,7 @@ export function useMarginSlideOver() {
   }, [draft]);
 
   const openSlideOver = useCallback((item: ComparisonTableRow, competidoresList: string[]) => {
-    const miMarca = competidoresList[0] || 'Mi Marca';
+    const miMarca = competidoresList[0] || DEFAULT_MY_BRAND;
     const precioTienda = item.precios?.[miMarca] ?? null;
     const preciosComp: Record<string, number | null> = {};
     competidoresList.forEach(brand => {
@@ -122,7 +123,7 @@ export function useMarginSlideOver() {
   const refreshFromTable = useCallback((item: ComparisonTableRow, competidoresList: string[]) => {
     setDraft(prev => {
       if (!prev) return prev;
-      const miMarca = competidoresList[0] || 'Mi Marca';
+      const miMarca = competidoresList[0] || DEFAULT_MY_BRAND;
       const nuevosPreciosComp: Record<string, number | null> = {};
       competidoresList.forEach(brand => {
         if (brand !== miMarca) {

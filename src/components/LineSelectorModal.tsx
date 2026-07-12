@@ -5,6 +5,7 @@ import { ModuleType } from '../enums';
 import { Modal, Select, SearchInput, Button } from './ui';
 import { DataTable, type IColumn } from './DataTable';
 import { normalize } from '../utils/normalize';
+import { APP_LOCALE } from '../utils/config';
 import { Package, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 import type { State } from "../store/useAppStore";
@@ -73,12 +74,12 @@ function getUniqueSortedLineas(productos: IProducto[]): string[] {
     const linea = (p.linea ?? "").toString().trim();
     if (linea) set.add(linea);
   }
-  const collator = new Intl.Collator("es-PE");
+  const collator = new Intl.Collator(APP_LOCALE);
   return Array.from(set).sort((a, b) => collator.compare(a, b));
 }
 
 function sortByCodigoAsc(productos: IProducto[]): IProducto[] {
-  const collator = new Intl.Collator("es-PE", { numeric: true, sensitivity: "base" });
+  const collator = new Intl.Collator(APP_LOCALE, { numeric: true, sensitivity: "base" });
   return [...productos].sort((a, b) =>
     collator.compare(String(a.codigo ?? ""), String(b.codigo ?? ""))
   );

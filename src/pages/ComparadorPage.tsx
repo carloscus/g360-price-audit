@@ -9,11 +9,11 @@ import { useAuth } from '../contexts/auth';
 import { useToast } from '../contexts/ToastContext';
 import { SearchInput } from '../components/ui/SearchInput';
 import { ProductAnalysisCardWithBarChartRefactor } from '../components/comparador/ProductAnalysisCardWithBarChartRefactor';
-import { ProductPieChartModal } from '../components/comparador/ProductPieChartModal';
+import { ProductBarChartModal } from '../components/comparador/ProductBarChartModal';
 import { BrandRankingChart } from '../components/comparador/BrandRankingChart';
-import { getBrandColor } from '../utils/colorScheme';
-import { PieChart as PieChartIcon, Download, RefreshCw, Search, BarChart3, Trophy, TrendingDown, TrendingUp, Target } from 'lucide-react';
-import { Tooltip, ConfirmModal, SearchResultsDropdown } from '../components/ui';
+import { Download, RefreshCw, BarChart3 } from 'lucide-react';
+import { Tooltip, ConfirmModal, SearchResultsDropdown, Spinner } from '../components/ui';
+import { formatDateForFilename, DEFAULT_MY_BRAND } from '../utils/config';
 import { LineSelectorModalTrigger } from '../components/LineSelectorModal';
 import { ExcelJSExportButton } from '../components/ExcelJSExportButton';
 import { useComparadorKPIs } from '../hooks/useComparadorKPIs';
@@ -22,7 +22,9 @@ import { useComparadorColumns } from '../hooks/useComparadorColumns';
 import { useMarginSlideOver } from '../hooks/useMarginSlideOver';
 import { MarginSlideOver } from '../components/margen/MarginSlideOver';
 import { BulkImportButton } from '../components/comparador/BulkImportButton';
+import { MobilePriceRow } from '../components/comparador/MobilePriceRow';
 import { useMarginStore } from '../store/useMarginStore';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export const ComparadorPage: React.FC = () => {
   const { 
@@ -36,15 +38,18 @@ export const ComparadorPage: React.FC = () => {
   } = useAppStore();
   const lista = useAppStore((state) => state.listas.precios);
   const marginProductos = useMarginStore((state) => state.productos);
+  const actualizarCampoMarginProducto = useMarginStore((state) => state.actualizarCampo);
+  const agregarProductoConCosto = useMarginStore((state) => state.agregarProductoConCosto);
   const eliminarMarginProducto = useMarginStore((state) => state.eliminarProducto);
 
 const [searchTerm, setSearchTerm] = useState('');
   const [competidores, setCompetidores] = useState<string[]>([]);
-  const [selectedProductForPieChart, setSelectedProductForPieChart] = useState<ComparisonTableRow | null>(null);
+  const [selectedProductForChart, setSelectedProductForChart] = useState<ComparisonTableRow | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [selectedSearchResults, setSelectedSearchResults] = useState<Set<string>>(new Set());
   const [highlightedBrand, setHighlightedBrand] = useState<string | null>(null);
   const [visibleProducts, setVisibleProducts] = useState<number>(10);
+  const isMobile = useIsMobile();
 
 const dashboardRef = useRef<HTMLDivElement>(null);
 const exportWrapperRef = useRef<HTMLDivElement>(null);
@@ -78,7 +83,7 @@ useEffect(() => {
 	}
 
 	if (marcas.length < 2) {
-		setCompetidores(['Mi Marca', 'Competidor 1']);
+		setCompetidores([DEFAULT_MY_BRAND, 'Competidor 1']);
 	} else {
 		const marcasUnicas: string[] = [];
 		const contadorMarcas: { [key: string]: number } = {};
@@ -136,6 +141,17 @@ const handlePriceChange = useCallback((codigo: string, competidor: string, valor
   if (valor === null) { delete nuevosPrecios[competidor]; } else { nuevosPrecios[competidor] = valor; }
   actualizarProductoEnLista(codigo, 'precios', nuevosPrecios);
   }, [lista, actualizarProductoEnLista]);
+
+  const handleCostChange = useCallback((codigo: string, valor: number | null) => {
+    const productoActual = lista.find(p => p.codigo === codigo);
+    if (!productoActual) return;
+    const marginProduct = marginProductos.find(m => m.codigo === codigo);
+    if (marginProduct) {
+      actualizarCampoMarginProducto(codigo, 'costo', valor);
+    } else {
+      agregarProductoConCosto(productoActual, valor);
+    }
+  }, [lista, marginProductos, actualizarCampoMarginProducto, agregarProductoConCosto]);
 
   const handleDeleteProduct = useCallback((codigo: string) => {
     eliminarProductoDeLista(codigo);
@@ -195,8 +211,9 @@ const {
     onSort: handleSort,
     onBrandHover: handleBrandHover,
     onDeleteProduct: handleDeleteProduct,
-    onViewPieChart: setSelectedProductForPieChart,
+    onViewChart: setSelectedProductForChart,
     onOpenSlideOver: handleOpenSlideOver,
+    onCostChange: handleCostChange,
     marginProductos,
   });
 
@@ -246,7 +263,7 @@ return (
 							moduloKey="precios" 
 							buttonClassName="text-xs sm:text-sm py-2.5 flex-1 sm:flex-initial flex items-center justify-center hover:bg-[var(--color-primary-500)] hover:text-white hover:border-[var(--color-primary-500)] transition-all" 
 						/>
-						<BulkImportButton />
+						{!isMobile && <BulkImportButton />}
 						<Tooltip content="Añadir producto manualmente si no se encuentra en la búsqueda" position="top">
 							<button onClick={() => { agregarProductoToLista({ codigo: searchTerm, nombre: searchTerm, ean_14: '', peso: 0, stock_referencial: 0, linea: '', keywords: [] }); setSearchTerm(''); }} disabled={!searchTerm || displayedResults.length > 0} className="btn btn-primary text-xs sm:text-sm py-2.5 flex-1 sm:flex-initial" aria-label="Añadir producto manualmente">
 								Añadir Manualmente
@@ -287,7 +304,7 @@ return (
 							<Tooltip content="Exportar como página HTML navegable" position="top">
 								<button onClick={handleHTMLExport} disabled={isSubmitting || lista.length === 0} className="btn btn-primary" aria-label={isSubmitting ? "Generando HTML..." : "Exportar como HTML navegable"} aria-busy={isSubmitting}>
 									{isSubmitting ? (
-										<span className="flex items-center gap-2">											<svg className="animate-spin h-4 w-4 text-[var(--color-btn-primary-text)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A77.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Generando...</span></span>
+										<span className="flex items-center gap-2"><Spinner size={16} className="text-[var(--color-btn-primary-text)]" /><span>Generando...</span></span>
 									) : (
 										<span className="flex items-center gap-2"><Download className="w-5 h-5" aria-hidden="true" /><span>Exportar HTML</span></span>
 									)}
@@ -296,7 +313,7 @@ return (
 							<Tooltip content="Exportar tabla de comparación a PNG" position="top">
 								<button onClick={handlePngExportClick} disabled={isSubmitting || lista.length === 0} className="btn btn-primary" aria-label={isSubmitting ? "Generando PNG..." : "Exportar tabla de comparación a PNG"} aria-busy={isSubmitting}>
 									{isSubmitting ? (
-											<span className="flex items-center gap-2"><svg className="animate-spin h-4 w-4 text-[var(--color-btn-primary-text)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Generando...</span></span>
+											<span className="flex items-center gap-2"><Spinner size={16} className="text-[var(--color-btn-primary-text)]" /><span>Generando...</span></span>
 									) : (
 										<span className="flex items-center gap-2"><Download className="w-5 h-5" aria-hidden="true" /><span>Exportar PNG</span></span>
 									)}
@@ -306,13 +323,33 @@ return (
 					</div>
 
 					{lista.length > 0 ? (
-						<div className="rounded-xl overflow-hidden border border-[var(--border-primary)] shadow-sm">
-							<DataTable data={sortedData} columns={columns} tableClassName="w-full" />
-						</div>
+						<>
+							<div className={`rounded-xl overflow-hidden border border-[var(--border-primary)] shadow-sm ${isMobile ? 'hidden' : ''}`} data-no-export>
+								<DataTable data={sortedData} columns={columns} tableClassName="w-full" />
+							</div>
+							{isMobile && (
+								<div className="space-y-3">
+									{sortedData.map(item => (
+										<MobilePriceRow
+											key={item.codigo}
+											item={item as ComparisonTableRow & Record<string, unknown>}
+											columns={columns}
+											competidores={competidores}
+											marginProductos={marginProductos}
+											onPriceChange={handlePriceChange}
+											onCostChange={handleCostChange}
+											onViewChart={setSelectedProductForChart}
+											onDeleteProduct={handleDeleteProduct}
+											onOpenSlideOver={handleOpenSlideOver}
+										/>
+									))}
+								</div>
+							)}
+						</>
 					) : (
 						<div className="text-center py-12 px-4 rounded-xl border-2 border-dashed border-[var(--border-secondary)] bg-[var(--color-comparador-surface)] animate-fade-in">
 							<div className="w-14 h-14 mx-auto bg-[var(--surface-elevated)] rounded-xl flex items-center justify-center mb-4 shadow-md border border-[var(--border-primary)]">
-								<PieChartIcon className="h-7 w-7 text-[var(--color-comparador-primary)]" />
+								<BarChart3 className="h-7 w-7 text-[var(--color-comparador-primary)]" />
 							</div>
 							<h3 className="text-base font-semibold text-[var(--text-primary)]">Comienza a comparar</h3>
 							<p className="mt-1 text-[var(--text-secondary)] max-w-md mx-auto text-sm leading-relaxed">Utiliza el buscador superior para agregar productos a la lista y comenzar el análisis de precios.</p>
@@ -321,10 +358,10 @@ return (
 				</section>
 
 				{lista.length > 0 && (
-					<section className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+					<section className={`animate-slide-up ${isMobile ? 'hidden sm:block' : ''}`} style={{ animationDelay: '500ms' }}>
 						<div className="flex items-center justify-between mb-3">
 							<h2 className="text-lg font-bold text-[var(--text-primary)]">Análisis Individual por Producto</h2>
-							<div className="flex items-center gap-2">
+							<div className={`flex items-center gap-2 ${isMobile ? 'hidden' : ''}`}>
 <span className="text-xs text-[var(--text-secondary)]">Ver:</span>
                   {[5, 10, 20].map((count) => (
                     <button
@@ -342,11 +379,14 @@ return (
 							</div>
 						</div>
 						<div className="product-analysis-grid-compact">
-							{sortedData.slice(0, visibleProducts).map(item => (
+							{sortedData.slice(0, visibleProducts).map(item => {
+								const costoItem = marginProductos.find(m => m.codigo === item.codigo)?.costo ?? null;
+								return (
 								<div key={`card-wrapper-${item.codigo}`} id={`product-card-${item.codigo}`}>
-									<ProductAnalysisCardWithBarChartRefactor key={item.codigo} item={item} competidores={competidores} highlightedBrand={highlightedBrand} onBrandHover={handleBrandHover} />
+									<ProductAnalysisCardWithBarChartRefactor key={item.codigo} item={item} competidores={competidores} costo={costoItem} highlightedBrand={highlightedBrand} onBrandHover={handleBrandHover} />
 								</div>
-							))}
+								);
+							})}
 						</div>
 					</section>
 				)}
@@ -364,7 +404,7 @@ return (
 			</div>
 		</div>
 
-		<ProductPieChartModal product={selectedProductForPieChart} competidores={competidores} onClose={() => setSelectedProductForPieChart(null)} />
+		<ProductBarChartModal product={selectedProductForChart} competidores={competidores} marginProductos={marginProductos} onClose={() => setSelectedProductForChart(null)} />
 
       <MarginSlideOver
         isOpen={slideOver.isOpen}
