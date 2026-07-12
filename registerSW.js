@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/g360-price-audit/sw.js', { scope: '/g360-price-audit/' })})}
