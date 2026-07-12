@@ -178,7 +178,6 @@ export const useComparadorColumns = ({
             onPriceChange={(value) => onCostChange(item.codigo, value)}
             competidor="costo"
             item={item}
-            type="costo"
           />
         );
       },
