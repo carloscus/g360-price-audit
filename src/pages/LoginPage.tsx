@@ -6,6 +6,22 @@ import { MeshGradient, GrainyBackground } from '../components/ui/VisualEffects';
 import { LogIn, User, Mail, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { Spinner } from '../components/ui';
+import LogoCipsaSolid from '../assets/brand/cipsa/logotypes/Logo_cipsa_solid.svg';
+
+/**
+ * RATE LIMITING SOLO CLIENTE - LIMITACIÓN DE SEGURIDAD
+ * ====================================================
+ * El rate limiting implementado aquí es solo del lado cliente (localStorage).
+ * 
+ * LIMITACIONES:
+ * - Un atacante puede borrar/modificar localStorage para evadir el límite
+ * - No hay protección real contra ataques de fuerza bruta
+ * 
+ * RECOMENDACIÓN PARA PRODUCCIÓN:
+ * - Implementar rate limiting server-side por IP y email
+ * - Retornar tiempo de bloqueo desde el servidor
+ * - Usar CAPTCHA después de intentos fallidos
+ */
 
 const LoginPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -159,7 +175,7 @@ const LoginPage: React.FC = () => {
                 aria-hidden="true"
               >
                 <img 
-                  src={`${import.meta.env.BASE_URL}favicon.svg`} 
+                  src={LogoCipsaSolid} 
                   alt="CIPSA Logo" 
                   className="w-full h-full object-contain" 
                 />
@@ -227,7 +243,7 @@ const LoginPage: React.FC = () => {
                 aria-hidden="true"
               >
                 <img 
-                  src={`${import.meta.env.BASE_URL}favicon.svg`} 
+                  src={LogoCipsaSolid} 
                   alt="CIPSA Logo" 
                   className="w-full h-full object-contain" 
                 />

@@ -6,6 +6,18 @@
 
 import { debugLog, debugWarn, formatDateForFilename, APP_LOCALE } from './config';
 
+/**
+ * Sana HTML para prevenir XSS en snapshots exportados
+ * Remueve scripts, event handlers y javascript: URLs
+ */
+function sanitizeHTML(dirty: string): string {
+  return dirty
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/\s*on\w+\s*=\s*(['"])[^'"]*\1/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/data:/gi, '');
+}
+
 interface HTMLSnapshotOptions {
   /** Título del documento */
   title: string;
@@ -392,10 +404,10 @@ export async function generateHTMLSnapshot(
     } catch (e) {
 debugWarn('No se pudo convertir un canvas a imagen:', e);
 		}
-	}
+}
 
-	// Generar el documento HTML
-	const htmlContent = createHTMLDocument(clone.innerHTML, options);
+	// Generar el documento HTML (sanitizado para prevenir XSS)
+	const htmlContent = createHTMLDocument(sanitizeHTML(clone.innerHTML), options);
 
 	// Generar nombre del archivo
 	const clientName = (cliente || 'reporte').toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -408,9 +420,6 @@ debugWarn('No se pudo convertir un canvas a imagen:', e);
 	debugLog(`✅ Snapshot HTML generado: ${filename}`);
 }
 
-/**
- * Genera un snapshot HTML de múltiples secciones
- */
 export async function generateMultiSectionHTMLSnapshot(
   sections: { element: HTMLElement; title: string }[],
   options: HTMLSnapshotOptions
@@ -429,11 +438,11 @@ export async function generateMultiSectionHTMLSnapshot(
     const elementsToRemove = clone.querySelectorAll('.no-export, .sr-only, button, input, select, textarea, [data-no-export]');
     elementsToRemove.forEach(el => el.remove());
     
-    // Agregar título de sección
+    // Agregar título de sección (sanitizado para prevenir XSS)
     combinedContent += `
       <section class="snapshot-section">
         <h2 class="text-lg font-bold mb-4 text-[var(--text-primary)]">${section.title}</h2>
-        ${clone.innerHTML}
+        ${sanitizeHTML(clone.innerHTML)}
       </section>
     `;
   }
@@ -482,8 +491,8 @@ debugWarn('No se pudo convertir un canvas a imagen:', e);
 		}
 	}
 
-	// Generar el documento HTML
-	const htmlContent = createHTMLDocument(clone.innerHTML, options);
+	// Generar el documento HTML (sanitizado para prevenir XSS)
+	const htmlContent = createHTMLDocument(sanitizeHTML(clone.innerHTML), options);
 
 	// Abrir en nueva pestaña
 	const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });

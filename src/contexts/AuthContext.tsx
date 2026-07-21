@@ -1,6 +1,24 @@
 import React, { useState, ReactNode } from 'react';
 import { AuthContext } from './auth';
 
+/**
+ * AUTENTICACIÓN SOLO CLIENTE - LIMITACIÓN DE SEGURIDAD
+ * ====================================================
+ * Esta implementación almacena la sesión en localStorage y la valida solo del lado cliente.
+ * 
+ * LIMITACIONES:
+ * - Un atacante con acceso al navegador puede modificar localStorage para autenticarse
+ *   como cualquier usuario sin conocer credenciales
+ * - No hay validación de sesión con el servidor
+ * - Los tokens de sesión no son a prueba de manipulaciones
+ * 
+ * RECOMENDACIÓN PARA PRODUCCIÓN:
+ * - Implementar autenticación server-side con JWT en httpOnly cookies
+ * - Validar sesión en el servidor en cada request protegido
+ * - Usar HTTPS obligatorio
+ * - Considerar OAuth/OIDC con proveedor externo
+ */
+
 const SESSION_KEY = 'g360_session';
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
 

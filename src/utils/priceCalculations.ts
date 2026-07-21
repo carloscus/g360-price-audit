@@ -34,10 +34,10 @@ export interface CompetitiveAnalysis {
  * Calcula el porcentaje de diferencia entre dos precios
  * @param current - Precio actual
  * @param base - Precio base para comparación
- * @returns Porcentaje de diferencia
+ * @returns Porcentaje de diferencia, o NaN si base es 0 (indeterminado)
  */
 export const calculatePercentage = (current: number, base: number): number => {
-  if (base === 0) return 0;
+  if (base === 0) return NaN; // Indeterminado: no se puede comparar con precio base 0
   return ((current - base) / base) * 100;
 };
 
@@ -82,6 +82,9 @@ export const calculatePercentageDifferences = (
   basePrice: number,
   baseLabel: string
 ): PercentageDifference[] => {
+  // No se puede comparar si el precio base es 0 o negativo
+  if (!basePrice || basePrice <= 0) return [];
+  
   return prices
     .filter(p => p.label !== baseLabel && p.value !== null && p.value > 0)
     .map(p => {

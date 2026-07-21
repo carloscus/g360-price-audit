@@ -4,6 +4,16 @@ import { API_BASE_URL } from './config';
 
 type ExportPayload = PedidoExport | InventarioExport | DevolucionesExport | PreciosExport;
 
+/**
+ * Sana un filename para prevenir path traversal y caracteres inválidos
+ */
+function sanitizeFilename(raw: string): string {
+  // Extraer solo el nombre del archivo (quitar cualquier ruta)
+  const justName = raw.replace(/^.*[\\/]/, '');
+  // Mantener solo caracteres seguros
+  return justName.replace(/[^a-zA-Z0-9._-]/g, '_') || 'reporte';
+}
+
 export const exportApi = async (payload: ExportPayload, export_format: 'xlsx' | 'pdf' | 'png' = 'xlsx'): Promise<{ blob: Blob; filename: string }> => {
   const response = await fetch(`${API_BASE_URL}/api/export`, {
     method: 'POST',
@@ -41,6 +51,8 @@ export const exportApi = async (payload: ExportPayload, export_format: 'xlsx' | 
       if (filename.toLowerCase().startsWith("utf-8''")) {
         filename = decodeURIComponent(filename.substring(7));
       }
+      // Sanitizar para prevenir path traversal
+      filename = sanitizeFilename(filename);
     }
   }
 

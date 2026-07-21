@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/auth';
 import { useAppStore } from '../store/useAppStore';
 import { ConfirmModal } from './ui/ConfirmModal';
 import { Footer } from './Footer';
+import LogoCipsaSolid from '../assets/brand/cipsa/logotypes/Logo_cipsa_solid.svg';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -72,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <div className="flex items-center gap-3" aria-label="CIPSA Logo">
               <img
-                src={`${import.meta.env.BASE_URL}favicon.svg`}
+                src={LogoCipsaSolid}
                 alt="CIPSA Logo"
                 className="h-9 w-auto block object-contain"
               />

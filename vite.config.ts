@@ -13,8 +13,8 @@ export default defineConfig({
         'favicon-16x16.png',
         'favicon-32x32.png',
         'apple-touch-icon.png',
-        'android-chrome-192x192.png',
-        'android-chrome-512x512.png',
+        'icon-192.png',
+        'icon-512.png',
       ],
       manifest: {
         name: 'Precios - Auditoría de Precios G360',
@@ -29,8 +29,8 @@ export default defineConfig({
         lang: 'es',
         categories: ['utilities', 'finance', 'productivity', 'business'],
         icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {
