@@ -1,0 +1,18 @@
+{
+  "name": "g360-price-audit",
+  "template": "web-pwa",
+  "version": "1.0.0",
+  "createdAt": "2026-03-03T00:00:00.000Z",
+  "brand": "cipsa",
+  "skill": "corporativo-g360",
+  "assets": [
+    {
+      "name": "components",
+      "addedAt": "2026-03-03T00:00:00.000Z"
+    },
+    {
+      "name": "skills",
+      "addedAt": "2026-03-03T00:00:00.000Z"
+    }
+  ]
+}

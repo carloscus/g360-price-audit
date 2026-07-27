@@ -21,6 +21,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { saveCatalogToIndexedDB } from '../utils/indexedDb';
 import { sessionCache } from '../utils/sessionCache';
+import { processBulkImport } from '../utils/bulkImport';
 import type { IForm, IProducto, IProductoEditado } from '../interfaces';
 
 // --- Tipos Adicionales ---
@@ -218,47 +219,9 @@ export const useAppStore = create<State & Actions>()(
 
       importarProductosMasivamente: (rows) => {
         const { catalogo, listas, formState } = get();
-        const currentList = [...listas.precios];
-
-        // Determinar la marca 1 (PRECIO_TIENDA en el Excel se mapea a esta marca)
         const marca1 = (formState.precios.marca1 || '').trim().toLowerCase();
-        
-        rows.forEach(row => {
-          // Buscar producto en catálogo por SKU (codigo)
-          const product = catalogo.find(p => p.codigo === String(row.sku || row.SKU || ''));
-          if (!product) return;
-
-          const existingIdx = currentList.findIndex(p => p.codigo === product.codigo);
-          
-          const preciosNuevos: Record<string, number> = {};
-          // Mapear precios dinámicos según las columnas del Excel
-          Object.entries(row).forEach(([key, val]) => {
-            if (key.startsWith('PRECIO_') && val !== null && val !== undefined) {
-              const brandName = key.replace('PRECIO_', '').replace(/_/g, ' ').toLowerCase().trim();
-              preciosNuevos[brandName] = Number(val);
-            }
-          });
-
-          // PRECIO_TIENDA se mapea a la marca 1 (ej. vinifan)
-          if (marca1 && row.PRECIO_TIENDA !== null && row.PRECIO_TIENDA !== undefined) {
-            preciosNuevos[marca1] = Number(row.PRECIO_TIENDA);
-          }
-
-          // Preservar precios existentes y mergear los nuevos
-          const preciosExistentes = existingIdx > -1 ? currentList[existingIdx].precios || {} : {};
-          const productoEditado: IProductoEditado = {
-            ...(existingIdx > -1 ? currentList[existingIdx] : { ...product, cantidad: 1, observaciones: '', precios: {} }),
-            precios: { ...preciosExistentes, ...preciosNuevos }
-          };
-
-          if (existingIdx > -1) {
-            currentList[existingIdx] = productoEditado;
-          } else {
-            currentList.push(productoEditado);
-          }
-        });
-
-        set({ listas: { precios: currentList } });
+        const updatedList = processBulkImport(rows, catalogo, listas.precios, marca1);
+        set({ listas: { precios: updatedList } });
       },
 
       resetearModulo: () => {

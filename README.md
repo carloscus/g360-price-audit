@@ -92,73 +92,90 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 ```
 g360-price-audit/
 ├── .github/workflows/
-│   └── deploy.yml              # CI/CD GitHub Actions
+│   └── deploy.yml                  # CI/CD GitHub Actions
 ├── docs/
-│   └── MANUAL_USUARIO.md       # Guía de usuario para diapositivas
+│   └── MANUAL_USUARIO.md           # Guía de usuario completa
 ├── public/
 │   └── data/
-│       └── catalogo_productos.json  # Catálogo de productos
+│       └── catalogo_productos.json # Catálogo de productos (JSON)
 ├── schemas/
-│   ├── precios.schema.json
-│   └── precios.types.ts
+│   ├── precios.schema.json         # Schema JSON de validación
+│   └── precios.types.ts            # Tipos TypeScript generados
 ├── src/
 │   ├── api/
-│   │   └── schemas.ts
+│   │   └── schemas.ts              # Esquemas de exportación (Inventario, Pedido, Precios)
+│   ├── assets/
+│   │   └── brand/cipsa/            # Assets de marca CIPSA (logotipos SVG/PNG)
 │   ├── components/
-│   │   ├── comparador/         # BrandRankingChart, MobilePriceRow, PriceInput,
-│   │   │                       # ProductAnalysisCardWithBarChartRefactor, ProductBarChartModal, etc.
-│   │   ├── margen/             # MarginSlideOver (simulador de propuestas)
-│   │   ├── ui/                 # Button, Modal, SearchInput, Toast, Tooltip, Select, PriceInputEnhanced
-│   │   ├── DataTable.tsx       # Tabla principal de precios
-│   │   ├── ExcelJSExportButton.tsx
-│   │   ├── Layout.tsx
-│   │   ├── DatosGeneralesForm.tsx
-│   │   ├── ErrorBoundary.tsx
-│   │   ├── Footer.tsx
-│   │   └── LineSelectorModal.tsx
-│   ├── contexts/               # AuthContext, ToastContext
+│   │   ├── comparador/             # BrandRankingChart, BulkImportButton, MobilePriceRow,
+│   │   │                           # PriceBarChart, PriceInput, ProductBarChartModal
+│   │   ├── margen/                 # MarginSlideOver (simulador de propuestas)
+│   │   ├── ui/                     # Button, Modal, KPICard, SearchInput, Toast, Tooltip, Select
+│   │   ├── DataTable.tsx           # Tabla principal de precios
+│   │   ├── ExcelJSExportButton.tsx # Botón de exportación XLSX
+│   │   ├── Layout.tsx              # Layout principal con navbar
+│   │   ├── DatosGeneralesForm.tsx  # Formulario de datos generales
+│   │   ├── ErrorBoundary.tsx       # Manejo de errores global
+│   │   ├── Footer.tsx              # Footer con firma G360
+│   │   └── LineSelectorModal.tsx   # Modal de selección por línea
+│   ├── contexts/
+│   │   ├── auth.ts                 # Contexto de autenticación (tipos + hook)
+│   │   ├── AuthContext.tsx          # Provider de autenticación
+│   │   └── ToastContext.tsx         # Contexto de notificaciones
 │   ├── hooks/
-│   │   ├── useComparadorColumns.tsx
-│   │   ├── useComparadorExport.tsx
-│   │   ├── useComparadorKPIs.ts
-│   │   ├── useIsMobile.ts
-│   │   ├── useMarginSlideOver.ts
-│   │   ├── useSearch.ts
-│   │   ├── useCompetitiveAnalysis.ts
-│   │   ├── useFormValidation.ts
-│   │   └── useToasts.ts
+│   │   ├── useComparadorColumns.tsx # Definición de columnas de la tabla
+│   │   ├── useComparadorExport.tsx  # Lógica de exportación del comparador
+│   │   ├── useComparadorKPIs.ts    # Cálculo de KPIs del comparador
+│   │   ├── useCompetitiveAnalysis.ts # Análisis competitivo
+│   │   ├── useFormValidation.ts    # Validación de formularios
+│   │   ├── useIsMobile.ts         # Detección de dispositivo móvil
+│   │   ├── useMarginSlideOver.ts  # Lógica del slide-over de márgenes
+│   │   ├── useSearch.ts           # Búsqueda de productos
+│   │   └── useToasts.ts           # Sistema de notificaciones
 │   ├── pages/
-│   │   ├── ComparadorPage.tsx  # Página principal (todo en una)
-│   │   └── LoginPage.tsx
+│   │   ├── ComparadorPage.tsx      # Página principal (todo en una)
+│   │   └── LoginPage.tsx           # Página de login
 │   ├── store/
-│   │   ├── useAppStore.ts      # Estado global (productos, precios, marcas)
-│   │   └── useMarginStore.ts   # Estado de márgenes con persistencia
+│   │   ├── useAppStore.ts          # Estado global (productos, precios, marcas)
+│   │   └── useMarginStore.ts       # Estado de márgenes con persistencia
 │   ├── styles/
-│   │   ├── design-system.css   # CSS variables G360, slide-over animations
-│   │   ├── input-system-enhanced.css
-│   │   └── print-report.css
+│   │   ├── design-system.css       # CSS variables G360, animaciones
+│   │   ├── input-system-enhanced.css # Estilos de inputs mejorados
+│   │   └── print-report.css        # Estilos para impresión
 │   ├── utils/
-│   │   ├── excelJsGenerator.ts # Generador XLSX unificado con fórmulas
-│   │   ├── comparisonUtils.ts  # Cálculos de variación porcentual
-│   │   ├── priceCalculations.ts
-│   │   ├── calculationUtils.ts
-│   │   ├── api.ts, config.ts, colorScheme.ts, normalize.ts
-│   │   ├── downloadBlob.ts, htmlSnapshot.ts, sessionCache.ts
-│   │   └── indexedDb.ts
-│   ├── App.tsx
-│   ├── main.tsx
-│   ├── index.css
-│   ├── interfaces.ts
-│   ├── enums.ts
-│   └── vite-env.d.ts
+│   │   ├── api.ts                  # Configuración de API
+│   │   ├── bulkImport.ts           # Lógica de importación masiva
+│   │   ├── calculationUtils.ts     # Utilidades de cálculo de márgenes
+│   │   ├── cn.ts                   # Utility para concatenar clases
+│   │   ├── colorScheme.ts          # Paleta de colores por marca
+│   │   ├── comparisonUtils.ts      # Cálculos de variación porcentual
+│   │   ├── config.ts               # Configuración general
+│   │   ├── downloadBlob.ts         # Utilidad para descargar archivos
+│   │   ├── excelJsGenerator.ts     # Generador XLSX con fórmulas vivas
+│   │   ├── htmlSnapshot.ts         # Exportación a HTML
+│   │   ├── indexedDb.ts            # Persistencia en IndexedDB
+│   │   ├── normalize.ts            # Normalización de datos
+│   │   ├── priceCalculations.ts    # Cálculos de precios
+│   │   └── sessionCache.ts         # Caché de sesión
+│   ├── App.tsx                     # Router principal
+│   ├── enums.ts                    # Enums (ModuleType)
+│   ├── index.css                   # Estilos globales
+│   ├── interfaces.ts               # Interfaces y schemas Zod
+│   ├── main.tsx                    # Punto de entrada
+│   ├── toastDefinitions.ts         # Definiciones de notificaciones
+│   └── vite-env.d.ts               # Tipos de Vite
 ├── .gitignore
-├── eslint.config.js
-├── index.html
+├── eslint.config.js                # Configuración ESLint
+├── g360-manifest.json              # Manifesto G360 del proyecto
+├── index.html                      # HTML de entrada
 ├── package.json
 ├── postcss.config.js
+├── skill.json                      # Configuración de skill G360
 ├── tailwind.config.js
-├── tsconfig.json / tsconfig.app.json / tsconfig.node.json
-└── vite.config.ts
+├── tsconfig.json
+├── tsconfig.app.json
+├── tsconfig.node.json
+└── vite.config.ts                  # Configuración Vite + PWA
 ```
 
 ---
@@ -169,8 +186,8 @@ g360-price-audit/
 
 | Requisito | Versión |
 |-----------|---------|
-| Node.js | 24.x (verificado con v24.14.0) |
-| npm | 9.x o superior |
+| Node.js | 22.x |
+| npm | 10.x o superior |
 
 ### Instalación Local
 

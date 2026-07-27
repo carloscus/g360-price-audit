@@ -1,0 +1,34 @@
+{
+  "name": "corporativo-g360",
+  "description": "G360 Price Audit - Comparador de Precios y Simulador de Márgenes (CIPSA)",
+  "framework": "react",
+  "device": "pc",
+  "version": "1.0.0",
+  "brand": "cipsa",
+  "colors": {
+    "bg": "#0c1929",
+    "surface": "#1a2333",
+    "accent": "#f97316",
+    "primary": "#1a56db",
+    "text": "#f0f6fc",
+    "muted": "#8b949e",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "error": "#ef4444"
+  },
+  "effects": {
+    "glassmorphism": true,
+    "blur": "16px",
+    "rounded": "12px",
+    "neonGlow": true
+  },
+  "signature": {
+    "mode": "powered",
+    "text": "powered by G360"
+  },
+  "guidelines": {
+    "logo": "Logo_cipsa_solid.svg",
+    "app_icon": "cipsa/favicons/cipsa.ico",
+    "description": "Usar logo CIPSA + signature 'powered by G360'. Azul Marino #1a56db primario, Naranja Vinifan #f97316 para marca propia."
+  }
+}
