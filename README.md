@@ -480,6 +480,6 @@ g360 clean --all --dry-run
 
 ## 📄 Licencia
 
-Desarrollado por **Carlos Cusi** ([ccusi@outlook.com](mailto:ccusi@outlook.com)) con asistencia de IA.
+Desarrollado por **Carlos Cusi Clares** ([carlos.cusiclares@gmail.com](mailto:carlos.cusiclares@gmail.com)) con asistencia de IA.
 
 *G360 Ecosystem — CCUSI 2026*
