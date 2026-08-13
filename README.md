@@ -78,7 +78,6 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 | Zustand | 5.x | Gestión de estado con persistencia localStorage |
 | React Router DOM | 7.x | Navegación SPA |
 | Recharts | 3.x | Gráficos interactivos (barras) |
-| React Hook Form | — | Manejo de formularios |
 | Zod | 4.x | Validación de esquemas tipados |
 | ExcelJS | — | Generación de XLSX con fórmulas nativas |
 | Lucide React | — | Iconos vectoriales |

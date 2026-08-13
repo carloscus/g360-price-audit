@@ -197,12 +197,7 @@ export const useAppStore = create<State & Actions>()(
             ...state.listas,
             precios: state.listas.precios.map((p) => {
               if (p.codigo !== codigo) return p;
-              // Special handling for numeric conversions
-              if (campo === 'cantidad') {
-                const numericValue = typeof valor === 'string' ? parseFloat(valor) : valor;
-                return { ...p, [campo]: isNaN(numericValue as number) ? 0 : numericValue };
-              }
-              return { ...p, [campo]: valor };
+              return { ...p, [campo]: valor }; // Confiar en que el valor ya tiene el tipo correcto
             }),
           },
         }));

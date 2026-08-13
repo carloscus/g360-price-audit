@@ -507,13 +507,12 @@ button {
 }
 
 /* Input size 16px en móvil para evitar zoom */
-input,
-textarea,
-select {
-  font-size: 16px;
-  
-  @media (min-width: 640px) {
-    font-size: inherit;
+@media (max-width: 639px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  textarea {
+    font-size: 16px !important; /* Evita el zoom en iOS sin afectar el escritorio */
   }
 }
 
