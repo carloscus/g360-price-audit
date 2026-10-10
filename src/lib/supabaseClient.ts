@@ -18,3 +18,6 @@ export const getSupabaseClient = (): SupabaseClient | null => {
   client = createClient(url, anonKey);
   return client;
 };
+
+/** true si hay Supabase configurado (habilita el modo búsqueda de 1 campo) */
+export const isClientesHabilitado = (): boolean => getSupabaseClient() !== null;

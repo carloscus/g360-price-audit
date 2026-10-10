@@ -5,12 +5,13 @@
 // --------------------------------------------------------------------------- #
 
 // --- 1. Importaciones necesarias ---
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { FormGroup, Label } from './ui/FormControls';
 import { StyledInput } from './ui/StyledInput';
 import { SucursalInput } from './ui/SucursalInput';
 import { ClienteSearchInput } from './ui/ClienteSearchInput';
+import { isClientesHabilitado } from '../lib/supabaseClient';
 import type { ClienteResultado } from '../hooks/useClientes';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { useToast } from '../contexts/ToastContext';
@@ -80,6 +81,11 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
   };
 
   // --- Selección de cliente desde el buscador (autocompleta el formulario) ---
+  // Modo búsqueda (Supabase configurado): un solo campo llena Cliente, Documento
+  // y Cód.Cliente; Documento/Cód.Cliente se ocultan del formulario.
+  // Sin Supabase: los 3 campos manuales.
+  const clientesHabilitado = useMemo(() => isClientesHabilitado(), []);
+
   const handleClienteSelect = (cliente: ClienteResultado) => {
     actualizarFormulario('cliente', cliente.nom_cliente || '');
     if (cliente.doc_cliente) actualizarFormulario('documento_cliente', cliente.doc_cliente);
@@ -221,39 +227,54 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
 
         {/* Campos de Cliente y Documento */}
         {fieldConfig.showRucDni && (
-          <>
-            <FormGroup>
-              <Label htmlFor="documento_cliente">Documento</Label>
-              <div className="relative">
-                <StyledInput id="documento_cliente" name="documento_cliente" value={formState.documento_cliente || ''} onChange={handleChange} maxLength={11} placeholder="8 o 11 dígitos" variant={variant} className="h-7 text-sm pr-14" />
-                {(() => {
-                  const digits = (formState.documento_cliente || '').replace(/\D/g, '');
-                  const len = digits.length;
-                  if (len === 11) {
-                    return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-accent-500)] px-1.5 py-0.5 rounded pointer-events-none">RUC</span>;
-                  }
-                  if (len === 8) {
-                    return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-success-500)] px-1.5 py-0.5 rounded pointer-events-none">DNI</span>;
-                  }
-                  return null;
-                })()}
-              </div>
-            </FormGroup>
-            <FormGroup>
+          clientesHabilitado ? (
+            <FormGroup className="col-span-2 md:col-span-2 lg:col-span-3">
               <Label htmlFor="cliente">Cliente</Label>
               <ClienteSearchInput
                 value={formState.cliente || ''}
+                documento={formState.documento_cliente}
+                codigoCliente={formState.codigo_cliente}
                 onSelect={handleClienteSelect}
                 onClear={handleClienteClear}
                 onManualChange={handleClienteManualChange}
                 variant={variant}
               />
             </FormGroup>
-          </>
+          ) : (
+            <>
+              <FormGroup>
+                <Label htmlFor="documento_cliente">Documento</Label>
+                <div className="relative">
+                  <StyledInput id="documento_cliente" name="documento_cliente" value={formState.documento_cliente || ''} onChange={handleChange} maxLength={11} placeholder="8 o 11 dígitos" variant={variant} className="h-7 text-sm pr-14" />
+                  {(() => {
+                    const digits = (formState.documento_cliente || '').replace(/\D/g, '');
+                    const len = digits.length;
+                    if (len === 11) {
+                      return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-accent-500)] px-1.5 py-0.5 rounded pointer-events-none">RUC</span>;
+                    }
+                    if (len === 8) {
+                      return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-[var(--color-success-500)] px-1.5 py-0.5 rounded pointer-events-none">DNI</span>;
+                    }
+                    return null;
+                  })()}
+                </div>
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="cliente">Cliente</Label>
+                <ClienteSearchInput
+                  value={formState.cliente || ''}
+                  onSelect={handleClienteSelect}
+                  onClear={handleClienteClear}
+                  onManualChange={handleClienteManualChange}
+                  variant={variant}
+                />
+              </FormGroup>
+            </>
+          )
         )}
 
-        {/* Campo Código de Cliente */}
-        {fieldConfig.showCodigoCliente && (
+        {/* Campo Código de Cliente (manual: solo sin búsqueda de clientes) */}
+        {fieldConfig.showCodigoCliente && !clientesHabilitado && (
           <FormGroup>
             <Label htmlFor="codigo_cliente">Cód.Cliente</Label>
             <StyledInput type="text" id="codigo_cliente" name="codigo_cliente" value={formState.codigo_cliente || ''} onChange={handleChange} placeholder="Opcional" variant={variant} className="h-7 text-sm" />

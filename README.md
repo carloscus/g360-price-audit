@@ -237,9 +237,8 @@ npm run dev
 
 | Campo | Obligatorio | Descripción |
 |-------|-------------|-------------|
-| Documento | ✅ | RUC (11 dígitos) o DNI (8 dígitos) — badge automático según longitud |
-| Cliente | ✅ | Búsqueda por RUC, código o nombre (autocompletado desde Supabase). Al seleccionar llena Documento y Cód.Cliente. Sin Supabase configurado: texto libre |
-| Código Cliente | ❌ | Código interno (autocompletado al elegir cliente) |
+| Cliente | ✅ | **Un solo campo de búsqueda** (RUC, código o nombre con autocompletado desde Supabase). Al seleccionar muestra una tarjeta con los datos y llena Documento y Cód.Cliente automáticamente |
+| Documento / Cód.Cliente | auto | En modo búsqueda no aparecen en el formulario: se rellenan al elegir cliente. Sin Supabase configurado: campos manuales |
 | Sucursal | ✅ | **Siempre manual** (decisión de producto: no autocompletar) |
 | Fecha | ✅ | Fecha del análisis |
 | Marca 1-5 | ✅ | Hasta 5 competidores (Marca 1 = **tu marca**) |
