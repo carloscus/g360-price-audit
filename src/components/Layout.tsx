@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { useAppStore } from '../store/useAppStore';
 import { ConfirmModal } from './ui/ConfirmModal';
 import { Footer } from './Footer';

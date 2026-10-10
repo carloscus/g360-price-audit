@@ -10,6 +10,8 @@ import { useAppStore } from '../store/useAppStore';
 import { FormGroup, Label } from './ui/FormControls';
 import { StyledInput } from './ui/StyledInput';
 import { SucursalInput } from './ui/SucursalInput';
+import { ClienteSearchInput } from './ui/ClienteSearchInput';
+import type { ClienteResultado } from '../hooks/useClientes';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { useToast } from '../contexts/ToastContext';
 import type { IForm, ValidationRule, FieldConfig } from '../interfaces';
@@ -52,7 +54,8 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
 
   // --- C. Lógica de Manejo de Cambios y Validación ---
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    let { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
 
     // Filtrar solo dígitos para documento_cliente
     if (name === 'documento_cliente') {
@@ -73,8 +76,26 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
       addToast(errorMessage!, 'error');
     }
 
-    // Actualizar el estado global del formulario
     actualizarFormulario(name as keyof IForm, value);
+  };
+
+  // --- Selección de cliente desde el buscador (autocompleta el formulario) ---
+  const handleClienteSelect = (cliente: ClienteResultado) => {
+    actualizarFormulario('cliente', cliente.nom_cliente || '');
+    if (cliente.doc_cliente) actualizarFormulario('documento_cliente', cliente.doc_cliente);
+    if (cliente.id_cliente) {
+      actualizarFormulario('codigo_cliente', cliente.id_cliente.replace(/^0+/, ''));
+    }
+  };
+
+  const handleClienteClear = () => {
+    actualizarFormulario('cliente', '');
+    actualizarFormulario('documento_cliente', '');
+    actualizarFormulario('codigo_cliente', '');
+  };
+
+  const handleClienteManualChange = (nombre: string) => {
+    actualizarFormulario('cliente', nombre);
   };
 
   // Función para manejar cambios en inputs de marca (limpia tooltips)
@@ -220,7 +241,13 @@ export const DatosGeneralesForm = React.forwardRef<{ getGeneralData: () => Recor
             </FormGroup>
             <FormGroup>
               <Label htmlFor="cliente">Cliente</Label>
-              <StyledInput id="cliente" name="cliente" value={formState.cliente || ''} onChange={handleChange} placeholder="Nombre o razón social" variant={variant} className="h-7 text-sm" />
+              <ClienteSearchInput
+                value={formState.cliente || ''}
+                onSelect={handleClienteSelect}
+                onClear={handleClienteClear}
+                onManualChange={handleClienteManualChange}
+                variant={variant}
+              />
             </FormGroup>
           </>
         )}

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Upload, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { useAppStore } from '../../store/useAppStore';
@@ -6,30 +6,40 @@ import { useToast } from '../../contexts/ToastContext';
 import { generateBulkUploadTemplate } from '../../utils/excelJsGenerator';
 import { downloadBlob } from '../../utils/downloadBlob';
 import { DEFAULT_MY_BRAND } from '../../utils/config';
+import type { IForm } from '../../interfaces';
+import { TemplateBrandsModal } from './TemplateBrandsModal';
 
 export const BulkImportButton: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importarProductosMasivamente = useAppStore((state) => state.importarProductosMasivamente);
+  const actualizarFormulario = useAppStore((state) => state.actualizarFormulario);
   const formState = useAppStore((state) => state.formState.precios);
   const { addToast } = useToast();
+  const [marcasModalOpen, setMarcasModalOpen] = useState(false);
 
-  const handleDownloadTemplate = async () => {
-    const marcas = [
+  const marcasIniciales = useMemo(
+    () => [
       formState.marca1 || DEFAULT_MY_BRAND,
-      formState.marca2,
-      formState.marca3,
-      formState.marca4,
-      formState.marca5,
-    ].filter((m): m is string => !!m);
+      formState.marca2 ?? '',
+      formState.marca3 ?? '',
+      formState.marca4 ?? '',
+      formState.marca5 ?? '',
+    ],
+    [formState.marca1, formState.marca2, formState.marca3, formState.marca4, formState.marca5]
+  );
 
-    if (marcas.length < 2) {
-      addToast('Debe configurar al menos 2 marcas en Datos Generales para generar la plantilla.', 'error');
-      return;
-    }
+  const handleConfirmMarcas = async (marcasLimpias: string[]) => {
+    setMarcasModalOpen(false);
 
+    // Sincronizar las marcas con Datos Generales para que la app y la plantilla coincidan
+    marcasLimpias.forEach((marca, i) => {
+      actualizarFormulario(`marca${i + 1}` as keyof IForm, marca);
+    });
+
+    const marcas = marcasLimpias.filter((m): m is string => m !== '');
     const blob = await generateBulkUploadTemplate(marcas);
     downloadBlob(blob, 'plantilla_carga_masiva.xlsx');
-    addToast('Plantilla descargada. Complete los SKUs y precios.', 'info');
+    addToast(`Plantilla generada con ${marcas.length} marcas. Complete los SKUs y precios.`, 'success');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +62,7 @@ export const BulkImportButton: React.FC = () => {
 
         importarProductosMasivamente(data);
         addToast(`${data.length} productos procesados correctamente`, 'success');
-      } catch (error) {
+      } catch {
         addToast('Error al procesar el archivo Excel', 'error');
       }
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -63,9 +73,9 @@ export const BulkImportButton: React.FC = () => {
   return (
     <>
       <button
-        onClick={handleDownloadTemplate}
+        onClick={() => setMarcasModalOpen(true)}
         className="btn btn-secondary text-xs sm:text-sm py-2.5 flex-1 sm:flex-initial flex items-center justify-center gap-2 border-[var(--border-primary)]"
-        title="Descargar planilla base"
+        title="Solicitar marcas y descargar planilla base"
       >
         <FileSpreadsheet className="w-4 h-4" />
         <span>Plantilla</span>
@@ -85,6 +95,14 @@ export const BulkImportButton: React.FC = () => {
         onChange={handleFileChange}
         accept=".xlsx, .xls"
         className="hidden"
+      />
+
+      <TemplateBrandsModal
+        key={marcasModalOpen ? 'open' : 'closed'}
+        isOpen={marcasModalOpen}
+        onClose={() => setMarcasModalOpen(false)}
+        onConfirm={handleConfirmMarcas}
+        marcasIniciales={marcasIniciales}
       />
     </>
   );

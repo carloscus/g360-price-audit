@@ -7,7 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import { Target, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import '../../styles/print-report.css';
 
-interface ProductAnalysisCardWithBarChartRefactorProps {
+interface ProductAnalysisCardProps {
    item: ComparisonTableRow;
    competidores: string[];
    costo?: number | null;
@@ -16,7 +16,7 @@ interface ProductAnalysisCardWithBarChartRefactorProps {
    onBrandHover?: (brandName: string | null) => void;
 }
 
-export const ProductAnalysisCardWithBarChartRefactor: React.FC<ProductAnalysisCardWithBarChartRefactorProps> = ({
+export const ProductAnalysisCard: React.FC<ProductAnalysisCardProps> = ({
    item,
    competidores,
    costo,
@@ -250,4 +250,4 @@ success: 'bg-[var(--surface-elevated)] border-[var(--color-success-300)]',
   );
 };
 
-export default ProductAnalysisCardWithBarChartRefactor;
+export default ProductAnalysisCard;

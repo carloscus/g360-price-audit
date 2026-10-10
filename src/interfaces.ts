@@ -69,17 +69,18 @@ export const ProductoEditadoSchema = ProductoSchema.extend({
   /** Precio promedio de los competidores. */
   precio_promedio: z.number().nonnegative().optional(),
 
-  // Columnas de ratio calculadas en el backend (mi_precio / competencia_precio) - 1
-  /** Ratio de precio con Marca 2: (precio_m1 / precio_m2) - 1 */
+  // Descuento requerido calculado en el cliente: 1 - (precio_competidor / precio_propio).
+  // Fórmula canónica en src/utils/priceCalculations.ts (calculateDsctoRequerido).
+  /** Descuento requerido vs Marca 2: 1 - (precio_m2 / precio_m1) */
   m2_ratio: z.number().optional(),
-  
-  /** Ratio de precio con Marca 3: (precio_m1 / precio_m3) - 1 */
+
+  /** Descuento requerido vs Marca 3: 1 - (precio_m3 / precio_m1) */
   m3_ratio: z.number().optional(),
-  
-  /** Ratio de precio con Marca 4: (precio_m1 / precio_m4) - 1 */
+
+  /** Descuento requerido vs Marca 4: 1 - (precio_m4 / precio_m1) */
   m4_ratio: z.number().optional(),
-  
-  /** Ratio de precio con Marca 5: (precio_m1 / precio_m5) - 1 */
+
+  /** Descuento requerido vs Marca 5: 1 - (precio_m5 / precio_m1) */
   m5_ratio: z.number().optional(),
 });
 

@@ -31,14 +31,44 @@ export interface CompetitiveAnalysis {
 }
 
 /**
- * Calcula el porcentaje de diferencia entre dos precios
+ * FÓRMULA CANÓNICA de comparación de precios (validada en el prototipo XLSX
+ * "Prisma Comercial", hoja PPvta Competencia: Dscto Requerido).
+ *
+ * Calcula el descuento que habría que aplicar al precio propio (mi marca)
+ * para igualar el precio del competidor:
+ *
+ *   dscto = 1 - (precioCompetidor / miPrecio)
+ *
+ * Convención de signo (igual en XLSX y en UI):
+ * - Positivo  → el competidor es más barato → hay que descontar (alerta)
+ * - Negativo  → el competidor es más caro → estamos ganando
+ * - 0         → precios empatados
+ *
+ * @param miPrecio - Precio propio (marca 1 / principal)
+ * @param precioCompetidor - Precio del competidor a comparar
+ * @returns Descuento requerido como fracción (ej: 0.158 = 15.8%), o NaN si miPrecio <= 0
+ */
+export const calculateDsctoRequerido = (
+  miPrecio: number,
+  precioCompetidor: number
+): number => {
+  if (!miPrecio || miPrecio <= 0) return NaN; // Indeterminado: sin precio propio no se compara
+  return 1 - precioCompetidor / miPrecio;
+};
+
+/**
+ * Calcula el porcentaje de diferencia entre dos precios.
+ * Es la negación del descuento requerido: positivo = el precio `current`
+ * está por ENCIMA de `base`.
+ * (Mantener esta relación: ((current - base) / base) = -calculateDsctoRequerido(base, current))
+ *
  * @param current - Precio actual
  * @param base - Precio base para comparación
  * @returns Porcentaje de diferencia, o NaN si base es 0 (indeterminado)
  */
 export const calculatePercentage = (current: number, base: number): number => {
-  if (base === 0) return NaN; // Indeterminado: no se puede comparar con precio base 0
-  return ((current - base) / base) * 100;
+  if (!base || base <= 0) return NaN; // Indeterminado: no se puede comparar con precio base 0
+  return -calculateDsctoRequerido(base, current) * 100;
 };
 
 /**

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { ComparisonTableRow } from '../../interfaces';
 import type { MarginProduct } from '../../store/useMarginStore';
 import type { IColumn } from '../DataTable';
-import { ChevronDown, ChevronUp, BarChart3, Trash2, Calculator, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, BarChart3, Trash2, Calculator } from 'lucide-react';
 import { Tooltip } from '../ui';
 import { PriceInput } from './PriceInput';
 import { getBrandColorByPosition } from '../../utils/colorScheme';
@@ -34,12 +34,6 @@ export const MobilePriceRow: React.FC<MobilePriceRowProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const mp = marginProductos.find(m => m.codigo === item.codigo);
   const baseCompetitor = competidores[0] || DEFAULT_MY_BRAND;
-
-  const competitorColumns = columns.filter(
-    c => competidores.slice(1).includes(String(c.accessor).replace('precios.', '')) 
-  );
-
-  const actionColumn = columns.find(c => c.accessor === 'accion');
 
   const renderCell = (col: IColumn<ComparisonTableRow>) => {
     if (col.cellRenderer) {
@@ -88,66 +82,60 @@ export const MobilePriceRow: React.FC<MobilePriceRowProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto border-t border-[var(--border-primary)]">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="bg-[var(--bg-tertiary)]">
-              {competidores.slice(1).map((comp) => (
-                <th key={comp} className="px-2 py-1.5 text-center font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap" style={{ color: getBrandColorByPosition(comp, competidores) }}>
+      {isExpanded && (
+        <div className="border-t border-[var(--border-primary)]">
+          {/* Una fila por competidor: sin scroll horizontal, escala a N marcas */}
+          {competidores.slice(1).map((comp) => {
+            const col = columns.find(c => c.accessor === `precios.${comp}`);
+            return (
+              <div key={comp} className="flex items-center gap-2 px-3 py-1.5 border-b border-[var(--border-secondary)]">
+                <span
+                  className="w-16 shrink-0 text-[10px] font-bold uppercase tracking-wider truncate"
+                  style={{ color: getBrandColorByPosition(comp, competidores) }}
+                  title={comp}
+                >
                   {comp}
-                </th>
-              ))}
-              <th className="px-2 py-1.5 text-center w-28" />
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {competidores.slice(1).map((comp) => {
-                const col = columns.find(c => c.accessor === `precios.${comp}`);
-                return (
-                  <td key={comp} className="px-2 py-1.5 align-top">
-                    {col && renderCell(col)}
-                  </td>
-                );
-              })}
-              <td className="px-2 py-1.5">
-                <div className="flex items-center gap-1 justify-center">
-                  <Tooltip content="Ver gráfico de barras" position="top">
-                    <button
-                      onClick={() => onViewChart(item)}
-                      className="p-1.5 rounded-md hover:bg-[var(--color-comparador-primary)]/10 text-[var(--color-comparador-primary)] transition-all"
-                      aria-label={`Ver gráfico de barras para ${item.nombre}`}
-                    >
-                      <BarChart3 className="h-4 w-4" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip content="Analizar margen" position="top">
-                    <button
-                      onClick={() => onOpenSlideOver(item)}
-                      className="p-1.5 rounded-md hover:bg-[var(--color-accent)]/10 text-[var(--color-accent)] transition-all relative"
-                      aria-label={`Analizar margen para ${item.nombre}`}
-                    >
-                      <Calculator className="h-4 w-4" />
-                      {mp && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[var(--color-success)] rounded-full border border-[var(--surface-elevated)]" />
-                      )}
-                    </button>
-                  </Tooltip>
-                  <Tooltip content="Eliminar" position="top">
-                    <button
-                      onClick={() => onDeleteProduct(item.codigo)}
-                      className="p-1.5 rounded-md hover:bg-[var(--color-danger)]/10 text-[var(--color-danger)] transition-all"
-                      aria-label={`Eliminar ${item.nombre}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </Tooltip>
+                </span>
+                <div className="flex-1 min-w-0">
+                  {col && renderCell(col)}
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </div>
+            );
+          })}
+          <div className="flex items-center justify-center gap-1 py-1.5">
+            <Tooltip content="Ver gráfico de barras" position="top">
+              <button
+                onClick={() => onViewChart(item)}
+                className="p-1.5 rounded-md hover:bg-[var(--color-comparador-primary)]/10 text-[var(--color-comparador-primary)] transition-all"
+                aria-label={`Ver gráfico de barras para ${item.nombre}`}
+              >
+                <BarChart3 className="h-4 w-4" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Analizar margen" position="top">
+              <button
+                onClick={() => onOpenSlideOver(item)}
+                className="p-1.5 rounded-md hover:bg-[var(--color-accent)]/10 text-[var(--color-accent)] transition-all relative"
+                aria-label={`Analizar margen para ${item.nombre}`}
+              >
+                <Calculator className="h-4 w-4" />
+                {mp && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[var(--color-success)] rounded-full border border-[var(--surface-elevated)]" />
+                )}
+              </button>
+            </Tooltip>
+            <Tooltip content="Eliminar" position="top">
+              <button
+                onClick={() => onDeleteProduct(item.codigo)}
+                className="p-1.5 rounded-md hover:bg-[var(--color-danger)]/10 text-[var(--color-danger)] transition-all"
+                aria-label={`Eliminar ${item.nombre}`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </Tooltip>
+          </div>
+        </div>
+      )}
     </article>
   );
 };

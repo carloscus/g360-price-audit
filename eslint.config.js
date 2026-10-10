@@ -20,4 +20,12 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Contextos y hooks exportan hooks junto a componentes (patrón estándar
+    // de React: AuthProvider + useAuth, ToastProvider + useToast).
+    files: ['src/contexts/**/*.{ts,tsx}', 'src/hooks/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

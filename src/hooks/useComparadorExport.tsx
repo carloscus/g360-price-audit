@@ -6,7 +6,7 @@ import { generateHTMLSnapshot } from '../utils/htmlSnapshot';
 import { debugLog, debugError, formatDateForFilename } from '../utils/config';
 import type { IForm, ComparisonTableRow } from '../interfaces';
 import { useToast } from '../contexts/ToastContext';
-import { useAuth } from '../contexts/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { useAppStore } from '../store/useAppStore';
 
 interface DashboardKPIs {

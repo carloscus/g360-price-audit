@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { MeshGradient, GrainyBackground } from '../components/ui/VisualEffects';
 import { LogIn, User, Mail, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { cn } from '../utils/cn';

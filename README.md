@@ -42,15 +42,17 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 
 | Módulo | Descripción |
 |--------|-------------|
-| **Comparador de Precios** | Compara precios entre tu marca y hasta 5 competidores con variaciones porcentuales automáticas |
+| **Comparador de Precios** | Compara precios entre tu marca y hasta 5 competidores. Fórmula canónica `1 − comp/propio` (dscto requerido), verificada contra el prototipo XLSX "Prisma Comercial" |
+| **Búsqueda de Clientes** | Autocompletado del maestro de clientes desde Supabase (RUC, código o nombre). Al seleccionar llena Cliente + Documento + Cód.Cliente. Degrada a texto libre sin configuración |
+| **Métricas de Vista Rápida** | Franja de KPIs: productos comparados, SKUs con precio ganado, posición promedio y margen promedio |
 | **Simulador de Márgenes** | Panel lateral (slide-over) para simular propuestas comerciales con validación de "Ranking de Estante" |
 | **Reporte para Jefatura** | Hoja secundaria en Excel con Costo de Fábrica, Margen de Protección mínimo y alertas semáforo |
-| **Exportación XLSX Robusta** | Celdas editables con formato condicional que sobreviven a pegados masivos (Ctrl+V). Sheet 2 "Tablero de Decisión" con 25 columnas agrupadas en 6 bloques, fórmulas vivas y STATUS multicondición. |
+| **Exportación XLSX Robusta** | Celdas editables con formato condicional que sobreviven a pegados masivos (Ctrl+V). Sheet 2 "Tablero de Decisión" con 25 columnas agrupadas en 6 bloques, fórmulas vivas y STATUS multicondición |
 | **Progressive Web App** | Service worker con precaché de assets, manifest con iconos maskable, instalable en dispositivos móviles y desktop |
-| **Responsive Mobile** | Vista adaptativa: cards en móvil con precios inline + tabla completa en desktop |
+| **Responsive Mobile** | Cards en móvil con filas por competidor (sin scroll horizontal), análisis individual accesible; captura de campo 100% directa |
 | **Snapshot HTML** | Exportación a HTML A4 con gráficos y KPIs visibles, ideal para imprimir |
 | **Persistencia local** | Datos de costo y propuestas persisten en localStorage entre sesiones |
-| **Carga Masiva** | Importación mediante plantilla Excel para poblar el comparador con cientos de registros en segundos |
+| **Carga Masiva** | Plantilla Excel con solicitud de los nombres de las 5 marcas (sincronizadas al comparador) |
 | **Identidad EAN13** | Integración total con códigos de barras de 13 dígitos para sincronización con ERPs corporativos |
 
 ---
@@ -79,6 +81,7 @@ Todo en una sola página: el vendedor levanta precios, simula propuestas en el s
 | React Router DOM | 7.x | Navegación SPA |
 | Recharts | 3.x | Gráficos interactivos (barras) |
 | Zod | 4.x | Validación de esquemas tipados |
+| Supabase JS | 2.x | Búsqueda de clientes (maestro en tabla `ventas`) |
 | ExcelJS | — | Generación de XLSX con fórmulas nativas |
 | Lucide React | — | Iconos vectoriales |
 | html2canvas | — | Captura de pantallas para exportación PNG |
@@ -93,7 +96,8 @@ g360-price-audit/
 ├── .github/workflows/
 │   └── deploy.yml                  # CI/CD GitHub Actions
 ├── docs/
-│   └── MANUAL_USUARIO.md           # Guía de usuario completa
+│   ├── MANUAL_USUARIO.md           # Guía de usuario completa
+│   └── supabase_clientes_view.sql  # Vista materializada + índices para búsqueda de clientes
 ├── public/
 │   └── data/
 │       └── catalogo_productos.json # Catálogo de productos (JSON)
@@ -106,10 +110,12 @@ g360-price-audit/
 │   ├── assets/
 │   │   └── brand/cipsa/            # Assets de marca CIPSA (logotipos SVG/PNG)
 │   ├── components/
-│   │   ├── comparador/             # BrandRankingChart, BulkImportButton, MobilePriceRow,
-│   │   │                           # PriceBarChart, PriceInput, ProductBarChartModal
+│   │   ├── comparador/             # Secciones de la página: ComparadorHeader, ComparadorSearchSection,
+│   │   │                           # ComparadorTableSection, AnalisisIndividualSection, ComparadorDashboardSection,
+│   │   │                           # ComparadorQuickMetrics, BrandRankingChart, BulkImportButton, TemplateBrandsModal,
+│   │   │                           # MobilePriceRow, PriceBarChart, PriceInput, ProductAnalysisCard, ProductBarChartModal
 │   │   ├── margen/                 # MarginSlideOver (simulador de propuestas)
-│   │   ├── ui/                     # Button, Modal, KPICard, SearchInput, Toast, Tooltip, Select
+│   │   ├── ui/                     # Button, Modal, KPICard, ClienteSearchInput, SearchInput, Toast, Tooltip, Select
 │   │   ├── DataTable.tsx           # Tabla principal de precios
 │   │   ├── ExcelJSExportButton.tsx # Botón de exportación XLSX
 │   │   ├── Layout.tsx              # Layout principal con navbar
@@ -118,10 +124,10 @@ g360-price-audit/
 │   │   ├── Footer.tsx              # Footer con firma G360
 │   │   └── LineSelectorModal.tsx   # Modal de selección por línea
 │   ├── contexts/
-│   │   ├── auth.ts                 # Contexto de autenticación (tipos + hook)
-│   │   ├── AuthContext.tsx          # Provider de autenticación
-│   │   └── ToastContext.tsx         # Contexto de notificaciones
+│   │   ├── AuthContext.tsx         # Autenticación: contexto + hook useAuth + AuthProvider
+│   │   └── ToastContext.tsx        # Notificaciones: contexto + hook useToast + ToastProvider
 │   ├── hooks/
+│   │   ├── useClientes.ts          # Búsqueda de clientes (Supabase, 2 fuentes con auto-detección)
 │   │   ├── useComparadorColumns.tsx # Definición de columnas de la tabla
 │   │   ├── useComparadorExport.tsx  # Lógica de exportación del comparador
 │   │   ├── useComparadorKPIs.ts    # Cálculo de KPIs del comparador
@@ -129,10 +135,11 @@ g360-price-audit/
 │   │   ├── useFormValidation.ts    # Validación de formularios
 │   │   ├── useIsMobile.ts         # Detección de dispositivo móvil
 │   │   ├── useMarginSlideOver.ts  # Lógica del slide-over de márgenes
-│   │   ├── useSearch.ts           # Búsqueda de productos
-│   │   └── useToasts.ts           # Sistema de notificaciones
+│   │   └── useSearch.ts           # Búsqueda de productos
+│   ├── lib/
+│   │   └── supabaseClient.ts       # Cliente Supabase (null si no hay env vars)
 │   ├── pages/
-│   │   ├── ComparadorPage.tsx      # Página principal (todo en una)
+│   │   ├── ComparadorPage.tsx      # Página principal (orquestador de secciones)
 │   │   └── LoginPage.tsx           # Página de login
 │   ├── store/
 │   │   ├── useAppStore.ts          # Estado global (productos, precios, marcas)
@@ -147,14 +154,14 @@ g360-price-audit/
 │   │   ├── calculationUtils.ts     # Utilidades de cálculo de márgenes
 │   │   ├── cn.ts                   # Utility para concatenar clases
 │   │   ├── colorScheme.ts          # Paleta de colores por marca
-│   │   ├── comparisonUtils.ts      # Cálculos de variación porcentual
+│   │   ├── comparisonUtils.ts      # Comparación con fórmula canónica (priceCalculations)
 │   │   ├── config.ts               # Configuración general
 │   │   ├── downloadBlob.ts         # Utilidad para descargar archivos
 │   │   ├── excelJsGenerator.ts     # Generador XLSX con fórmulas vivas
 │   │   ├── htmlSnapshot.ts         # Exportación a HTML
 │   │   ├── indexedDb.ts            # Persistencia en IndexedDB
 │   │   ├── normalize.ts            # Normalización de datos
-│   │   ├── priceCalculations.ts    # Cálculos de precios
+│   │   ├── priceCalculations.ts    # FÓRMULA CANÓNICA: calculateDsctoRequerido
 │   │   └── sessionCache.ts         # Caché de sesión
 │   ├── App.tsx                     # Router principal
 │   ├── enums.ts                    # Enums (ModuleType)
@@ -162,8 +169,10 @@ g360-price-audit/
 │   ├── interfaces.ts               # Interfaces y schemas Zod
 │   ├── main.tsx                    # Punto de entrada
 │   ├── toastDefinitions.ts         # Definiciones de notificaciones
-│   └── vite-env.d.ts               # Tipos de Vite
+│   └── vite-env.d.ts               # Tipos de Vite + env vars
+├── .env.example                    # Plantilla de variables de entorno
 ├── .gitignore
+├── AGENTS.md                       # Convenciones del proyecto para agentes IA
 ├── eslint.config.js                # Configuración ESLint
 ├── g360-manifest.json              # Manifesto G360 del proyecto
 ├── index.html                      # HTML de entrada
@@ -228,10 +237,10 @@ npm run dev
 
 | Campo | Obligatorio | Descripción |
 |-------|-------------|-------------|
-| Documento | ✅ | RUC (11 dígitos) o DNI (8 dígitos) |
-| Cliente | ✅ | Nombre o razón social |
-| Código Cliente | ❌ | Código interno |
-| Sucursal | ✅ | Seleccionar de la lista desplegable |
+| Documento | ✅ | RUC (11 dígitos) o DNI (8 dígitos) — badge automático según longitud |
+| Cliente | ✅ | Búsqueda por RUC, código o nombre (autocompletado desde Supabase). Al seleccionar llena Documento y Cód.Cliente. Sin Supabase configurado: texto libre |
+| Código Cliente | ❌ | Código interno (autocompletado al elegir cliente) |
+| Sucursal | ✅ | **Siempre manual** (decisión de producto: no autocompletar) |
 | Fecha | ✅ | Fecha del análisis |
 | Marca 1-5 | ✅ | Hasta 5 competidores (Marca 1 = **tu marca**) |
 
@@ -246,11 +255,13 @@ npm run dev
 
 | Código | Nombre | M1 | M2 | ... | M5 | % vs M2 | % vs M3 | Promedio | Sugerido |
 |--------|--------|----|----|-----|----|---------|---------|----------|----------|
-| PROD001 | Leche Evap. | 4.50 | 5.00 | ... | 4.80 | -10.0% | -6.25% | 4.77 | 4.60 |
+| PROD001 | Leche Evap. | 4.50 | 5.00 | ... | 4.80 | +10.0% | +6.25% | 4.77 | 4.60 |
 
-- **% Variación**: `((PrecioBase / PrecioCompetidor) - 1) × 100`
-  - Negativo = tu precio es **menor** (más competitivo)
-  - Positivo = tu precio es **mayor** (menos competitivo)
+- **% Variación** (fórmula canónica, validada contra el prototipo XLSX): `1 − (PrecioCompetidor / PrecioPropio)`
+  - Positivo = el competidor es **más barato** → hay que descontar para igualarlo (barra roja)
+  - Negativo = tu precio es **menor** → estás ganando (barra verde)
+  - Es el descuento requerido sobre tu precio para igualar al competidor
+- **Navegación por teclado en búsqueda de cliente**: `↑↓` navegar · `Enter` seleccionar · `Esc` cerrar
 
 ### 3. Simulador de Márgenes (Slide-over)
 
@@ -278,8 +289,8 @@ Permite importar decenas de productos con sus precios en segundos usando una pla
 
 **Cómo funciona:**
 
-1. **Requisito**: Debe tener al menos 2 marcas configuradas en Datos Generales
-2. **Descargar plantilla**: Haga clic en "Plantilla" para obtener el archivo Excel
+1. **Solicitar marcas**: Haga clic en "Plantilla" → se abre un modal para ingresar los nombres de las 5 marcas (Marca 1 obligatoria = tu marca; mínimo 2 completadas). Las marcas se sincronizan con el comparador. *(Solo desktop; en campo se captura directo en la app)*
+2. **Descargar plantilla**: Al confirmar se genera el Excel con una columna por marca
 3. **Llenar el Excel**:
 
    | SKU | PRECIO_TIENDA | PRECIO_<MARCA2> | PRECIO_<MARCA3> | ... |
@@ -382,11 +393,24 @@ Fabricante → Mayorista → Tienda
 
 ### Variables de Entorno
 
-Crea un archivo `.env` en la raíz:
+Crea un archivo `.env` en la raíz (ver `.env.example`):
 
 ```env
 VITE_BACKEND_URL=http://localhost:5001
+
+# Búsqueda de clientes (opcional: sin esto el campo Cliente es texto libre)
+VITE_SUPABASE_URL=https://<proyecto>.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon-key>
 ```
+
+### Búsqueda de Clientes (Supabase)
+
+La búsqueda consulta la tabla `ventas` (maestro de clientes embebido, mismo esquema que `g360-order-xlsx`). Para búsqueda instantánea por nombre, ejecuta `docs/supabase_clientes_view.sql` en el SQL Editor de Supabase: crea una vista materializada `clientes` con índices trgm y el hook la detecta automáticamente.
+
+| Fuente | Detectada por | Velocidad |
+|--------|---------------|-----------|
+| Vista `clientes` (recomendada) | Query exitoso a la vista | Milisegundos (índice trgm, búsqueda "contiene") |
+| Tabla `ventas` (fallback) | Vista inexistente | Rápido por código/RUC (`eq` indexado); por nombre sujeto a timeouts del escaneo |
 
 ### Catálogo de Productos
 

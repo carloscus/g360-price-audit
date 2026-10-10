@@ -308,7 +308,7 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
       difCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: brandColor } };
 
       const pctCell = row.getCell(pctCol);
-      pctCell.value = { formula: `=IFERROR(${ptLetter}${r}/${priceColLetter}${r}-1,"")` };
+      pctCell.value = { formula: `=IFERROR(1-${priceColLetter}${r}/${ptLetter}${r},"")` };
       pctCell.numFmt = percentageFormat;
       pctCell.alignment = { horizontal: 'right' };
       pctCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: brandColor } };
@@ -503,8 +503,6 @@ export async function generateExcelWithExcelJS(data: ExcelData): Promise<Blob> {
     const colI = colToLetter(MG_COL_P2_COSTO_MAYORISTA);        // 9
     const colK = colToLetter(MG_COL_CANTIDAD_MINIMA);           // 11
     const colL = colToLetter(MG_COL_MARGEN_MAYORISTA_P2);       // 12
-    const colN = colToLetter(MG_COL_UTILIDAD_UNIDAD_ACTUAL);    // 14
-    const colO = colToLetter(MG_COL_UTILIDAD_UNIDAD_P2);        // 15
     const colP = colToLetter(MG_COL_UTILIDAD_ACTUAL);           // 16
     const colQ = colToLetter(MG_COL_UTILIDAD_P2);               // 17
     const colS = colToLetter(MG_COL_VAR_UTILIDAD_PCT);          // 19

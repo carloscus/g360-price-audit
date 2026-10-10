@@ -2,12 +2,9 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import { ComparadorPage } from './pages/ComparadorPage';
-import { useToasts } from './hooks/useToasts';
-import ToastContainer from './components/ui/ToastContainer';
-import { ToastContext } from './contexts/ToastContext';
+import { ToastProvider } from './contexts/ToastContext';
 import LoginPage from './pages/LoginPage';
-import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './contexts/auth';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useAppStore } from './store/useAppStore';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -42,26 +39,23 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 // --- Componente Principal de la Aplicación ---
 function App() {
-  const { toasts, addToast, removeToast } = useToasts();
-
   return (
     <ErrorBoundary>
-    <ToastContext.Provider value={{ addToast }}>
-      <AuthProvider>
-        <ThemeWrapper>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<ErrorBoundary><LoginPage /></ErrorBoundary>} />
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="/home" element={<ProtectedRoute><Navigate to="/comparador" replace /></ProtectedRoute>} />
-              <Route path="/comparador" element={<ProtectedRoute><ErrorBoundary><ComparadorPage /></ErrorBoundary></ProtectedRoute>} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-            <ToastContainer toasts={toasts} onClose={removeToast} />
-          </Layout>
-        </ThemeWrapper>
-      </AuthProvider>
-    </ToastContext.Provider>
+      <ToastProvider>
+        <AuthProvider>
+          <ThemeWrapper>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<ErrorBoundary><LoginPage /></ErrorBoundary>} />
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/home" element={<ProtectedRoute><Navigate to="/comparador" replace /></ProtectedRoute>} />
+                <Route path="/comparador" element={<ProtectedRoute><ErrorBoundary><ComparadorPage /></ErrorBoundary></ProtectedRoute>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          </ThemeWrapper>
+        </AuthProvider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }

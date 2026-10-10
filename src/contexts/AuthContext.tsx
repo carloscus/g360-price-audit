@@ -1,17 +1,16 @@
-import React, { useState, ReactNode } from 'react';
-import { AuthContext } from './auth';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 /**
  * AUTENTICACIÓN SOLO CLIENTE - LIMITACIÓN DE SEGURIDAD
  * ====================================================
  * Esta implementación almacena la sesión en localStorage y la valida solo del lado cliente.
- * 
+ *
  * LIMITACIONES:
  * - Un atacante con acceso al navegador puede modificar localStorage para autenticarse
  *   como cualquier usuario sin conocer credenciales
  * - No hay validación de sesión con el servidor
  * - Los tokens de sesión no son a prueba de manipulaciones
- * 
+ *
  * RECOMENDACIÓN PARA PRODUCCIÓN:
  * - Implementar autenticación server-side con JWT en httpOnly cookies
  * - Validar sesión en el servidor en cada request protegido
@@ -28,6 +27,24 @@ interface SessionData {
   userEmail: string | null;
   timestamp: number;
 }
+
+interface AuthContextType {
+  isLoggedIn: boolean;
+  userName: string | null;
+  userEmail: string | null;
+  login: (name: string, email: string) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 const readSession = (): SessionData | null => {
   try {

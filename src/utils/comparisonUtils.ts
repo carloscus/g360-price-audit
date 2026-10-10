@@ -3,15 +3,18 @@
  * @description Utilidades para cálculos de comparación de precios
  * 
  * MANTENIMIENTO:
- * - Si las fórmulas de porcentaje cambian, actualizar aquí y en priceCalculations.ts
- * - Asegurar que la fórmula de variación sea consistente: ((Base / Competidor) - 1) * 100
- * - Los campos 'mX_ratio' se usan en el backend, no modificar sin consultar
+ * - La fórmula canónica vive en priceCalculations.ts (calculateDsctoRequerido)
+ * - Fórmula unificada con el prototipo XLSX "Prisma Comercial" (Dscto Requerido):
+ *   dscto = 1 - (precioCompetidor / precioPropio) → positivo = hay que descontar
+ * - Los campos 'mX_ratio' conservan su nombre por compatibilidad; su valor es
+ *   ahora el dscto requerido como fracción (0.158 = 15.8%)
  * 
  * @author Carlos Cusi
  * @date 2026-03-03
  */
 
 import type { IProductoEditado } from '../interfaces';
+import { calculateDsctoRequerido } from './priceCalculations';
 
 export function calculateDataWithPercentages(
   lista: IProductoEditado[],
@@ -44,26 +47,25 @@ export function calculateDataWithPercentages(
         const competidorActual = competidores[i];
         const pi = precios[competidorActual] ?? 0;
         if (pi > 0) {
-          // Fórmula: ((Base / Competidor) - 1) * 100
-          const ratio = (p1 / pi) - 1;
-          porcentajes[`% vs ${competidorActual}`] = `${(ratio * 100).toFixed(2)}%`;
-          
-          // Calcular ratio (Base / Competidor) - 1 para backend
-          const ratioValue = (p1 / pi) - 1;
-          porcentajes[`m${i + 1}_ratio`] = ratioValue;
+          // Fórmula canónica: dscto requerido = 1 - (precioCompetidor / precioPropio)
+          const dscto = calculateDsctoRequerido(p1, pi);
+          porcentajes[`% vs ${competidorActual}`] = `${(dscto * 100).toFixed(2)}%`;
+
+          // Fracción para export/compatibilidad (0.158 = 15.8%)
+          porcentajes[`m${i + 1}_ratio`] = dscto;
         } else {
           porcentajes[`% vs ${competidorActual}`] = 'N/A';
           porcentajes[`m${i + 1}_ratio`] = undefined;
         }
       }
 
-  } else {
-    // Si no hay precio base, todos los cálculos son N/A
-    for (let i = 1; i < competidores.length; i++) {
-      porcentajes[`% vs ${competidores[i]}`] = 'N/A';
-      porcentajes[`m${i + 1}_ratio`] = undefined;
+    } else {
+      // Si no hay precio base, todos los cálculos son N/A
+      for (let i = 1; i < competidores.length; i++) {
+        porcentajes[`% vs ${competidores[i]}`] = 'N/A';
+        porcentajes[`m${i + 1}_ratio`] = undefined;
+      }
     }
-  }
 
     // Calcular Precio Promedio - solo de los precios de competidores
     // IMPORTANTE: Solo incluir los precios de los competidores, no otros campos
@@ -81,33 +83,4 @@ export function calculateDataWithPercentages(
       precio_promedio: precioPromedio
     } as (IProductoEditado & Record<string, string | number | undefined>);
   });
-}
-
-export function calculateSummary(
-  dataWithPercentages: (IProductoEditado & Record<string, string | number | undefined>)[],
-  competidores: string[]
-) {
-  const pctHeaders = competidores.slice(1).map((comp) => `% vs ${comp}`);
-
-  const valores: number[] = [];
-
-  for (const row of dataWithPercentages) {
-    for (const h of pctHeaders) {
-      const raw = (row as unknown as Record<string, string | undefined>)[h];
-      if (!raw) continue;
-      const num = parseFloat(raw.replace('%', '').replace(',', '.'));
-      if (Number.isFinite(num)) valores.push(num);
-    }
-  }
-
-  if (valores.length === 0) {
-    return { min: 0, max: 0, n: 0 };
-  }
-  let min = valores[0];
-  let max = valores[0];
-  for (const v of valores) {
-    if (v < min) min = v;
-    if (v > max) max = v;
-  }
-  return { min, max, n: valores.length };
 }
